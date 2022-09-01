@@ -1,0 +1,53 @@
+{
+	"version": 2,
+	"timeout": "60000ms",
+	"cache_ttl": "300s",
+	"name": "sr-gateway",
+	"endpoints": 
+	[
+		{
+			"endpoint": "/api/iottimeseries/v3/timeseries/{var1}/{var2}",
+			"output_encoding": "no-op",
+			"headers_to_pass": [
+				"*"
+			],
+			"querystring_params": [
+				"*"
+			],
+			"method": "GET",
+			"backend": [{
+				"url_pattern": "/api/iottimeseries/v3/timeseries/{var1}/{var2}",
+				"encoding": "no-op",
+				"headers_to_pass": [
+					"*"
+				],
+				"querystring_params": [
+					"*"
+				],
+				"host": [
+					"http://127.0.0.1:8002"
+				],
+				"disable_host_sanitize": false
+			}]
+		},
+        {
+			"endpoint": "/api/iottimeseries/v3/timeseries",
+			"method": "PUT",
+			"headers_to_pass": [
+				"*"
+			],
+			"output_encoding": "no-op",
+			"backend": [{
+				"url_pattern": "/api/iottimeseries/v3/timeseries",
+				"encoding": "no-op",
+				"headers_to_pass": [
+					"*"
+				],
+				"host": [
+					"http://127.0.0.1:8002"
+				],
+				"disable_host_sanitize": false
+			}]
+		}
+	]
+}

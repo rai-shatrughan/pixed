@@ -1,0 +1,3 @@
+FROM debian:bullseye-slim
+COPY docker/app/conf/config.yaml /conf/config.yaml
+COPY docker/app/bin/ts-server /usr/bin/ts-server

@@ -1,0 +1,19 @@
+{
+	"timeseries": [{
+		"data": [{
+			"_time": "2022-08-12T10:29:14.072Z",
+			"temperature": 50,
+			"pressure": 20
+		}],
+		"entityId": "550e8400e29b41d4a716446655440000",
+		"propertySetName": "p1"
+	}, {
+		"data": [{
+			"_time": "2022-08-12T10:29:14.072Z",
+			"temperature": 50,
+			"pressure": 20
+		}],
+		"entityId": "550e8400e29b41d4a716446655440000",
+		"propertySetName": "p2"
+	}]
+}

@@ -1,0 +1,67 @@
+body {
+  /* background-color: black; */
+  background-color: white;
+}
+
+#ecHomeBar{
+  width: 100vw;
+  height: 50vh;
+}
+
+#ecHomeName{
+  width: 100vw;
+  height: 25vh;
+}
+
+#ecHomeTag{
+  width: 100vw;
+  height: 20vh;
+}
+
+.skillsItem {
+  width: 33vw;
+  height: 45vh;
+}
+
+#ecTechStack {
+  width: 100vw;
+  height: 90vh;
+}
+
+#ecDomains {
+  width: 100vw;
+  height: 90vh;
+}
+
+#containerVR {
+  width: 100vw;
+  height: 90vh;
+}
+
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: underline;
+}
+
+a:active {
+  text-decoration: underline;
+}
+
+.pure-menu-link {
+    padding: 10px;
+    color: white;
+}
+
+.pure-menu-horizontal {
+    display: inline-block;
+    width: 100vw;
+    vertical-align: middle;
+    -webkit-font-smoothing: antialiased;
+    background-color: #0047AB;
+    white-space: nowrap;
+    position: relative;
+}
+      
