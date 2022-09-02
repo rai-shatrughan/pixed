@@ -1,43 +1,34 @@
 package test
 
 import (
-	"math/rand"
+	// "encoding/json"
+	// "fmt"
+
 	"net/http"
-	"strconv"
 	"testing"
 	"time"
 
 	"github.com/gavv/httpexpect/v2"
+	"github.com/google/uuid"
 )
 
 var (
-	tsBaseURL     = "http://172.18.0.21:8002/api/iottimeseries/v3"
-	entityID28Len = "550a5500b55c55d5e12345678x"
-	max           = 99999
-	min           = 10000
+	tsBaseURL  = "http://172.18.0.21:8002/api/v1/timeseries"
+	baseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
 )
 
-type TimeSeriesDataItem struct {
-	Time        string      `json:"_time"`
-	Temperature interface{} `json:"temperature"`
-	Pressure    interface{} `json:"pressure"`
-}
-
-type TimeSeriesItem struct {
-	Data            []TimeSeriesDataItem `json:"data"`
-	EntityID        string               `json:"entityId"`
-	PropertySetName string               `json:"propertySetName"`
-}
-
 type TimeSeries struct {
-	Timeseries []TimeSeriesItem `json:"timeseries"`
+	Timestamp string `json:"timestamp"`
+	Property  string `json:"property"`
+	Unit      string `json:"unit"`
+	Value     int    `json:"value"`
 }
 
 func TestPutTimeSeries(t *testing.T) {
-	tsa := getTS("550e8400e29b41d4a716446655440000")
+	tsa := getTS()
 	e := httpexpect.New(t, tsBaseURL)
-	obj := e.PUT("/timeseries").
-		WithHeader("Authorization", "Bearer sr12345").
+	obj := e.PUT(baseEntity).
+		WithHeader("X-API-Key", "sr12345").
 		WithHeader("Content-Type", "application/json").
 		WithJSON(tsa).
 		Expect().
@@ -45,20 +36,21 @@ func TestPutTimeSeries(t *testing.T) {
 		JSON().
 		Object()
 
-	obj.Value("TimeseriesUpload").String().Equal("ok")
+	obj.Value("TimeseriesUpload").Equal("ok")
+
 }
 
 func TestGetTimeSeries(t *testing.T) {
 	e := httpexpect.New(t, tsBaseURL)
-	obj := e.GET("/timeseries/550e8400e29b41d4a716446655440000/p1").
-		WithHeader("Authorization", "Bearer sr12345").
-		WithHeader("Content-Type", "application/json").
+	obj := e.GET(baseEntity).
+		WithHeader("X-API-Key", "sr12345").
+		WithQuery("duration", "1m").
 		Expect().
 		Status(http.StatusOK).
 		JSON().
 		Array()
 
-	obj.First().Object().Value("pressure").Number().Equal(20)
+	obj.First().Object().Value("property")
 }
 
 func BenchmarkPostTimeSeries(b *testing.B) {
@@ -66,10 +58,10 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 	e := httpexpect.New(b, tsBaseURL)
 
 	for n := 0; n < b.N; n++ {
-		i := rand.Intn(max-min) + min
-		tsa := getTS(entityID28Len + strconv.Itoa(i))
-		obj := e.PUT("/timeseries").
-			WithHeader("Authorization", "Bearer sr12345").
+		myid := uuid.New()
+		tsa := getTS()
+		obj := e.PUT(myid.String()).
+			WithHeader("X-API-Key", "sr12345").
 			WithHeader("Content-Type", "application/json").
 			WithJSON(tsa).
 			Expect().
@@ -77,27 +69,32 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 			JSON().
 			Object()
 
-		obj.Value("TimeseriesUpload").String().Equal("ok")
+		obj.Value("TimeseriesUpload").Equal("ok")
 	}
 }
 
-func getTS(entityID string) TimeSeries {
+func getTS() []TimeSeries {
 	loc, _ := time.LoadLocation("UTC")
 
-	tsi := TimeSeriesDataItem{
-		Time:        time.Now().In(loc).Format("2006-01-02T15:04:05.000Z"),
-		Temperature: 50,
-		Pressure:    20,
+	ts1 := TimeSeries{
+		Timestamp: time.Now().In(loc).Format("2006-01-02T15:04:05.012Z"),
+		Property:  "temperature",
+		Unit:      "celcius",
+		Value:     10,
 	}
 
-	ts1 := TimeSeriesItem{EntityID: entityID, PropertySetName: "p1", Data: []TimeSeriesDataItem{tsi}}
-	ts2 := TimeSeriesItem{EntityID: entityID, PropertySetName: "p2", Data: []TimeSeriesDataItem{tsi}}
-	ts := []TimeSeriesItem{
+	ts2 := TimeSeries{
+		Timestamp: time.Now().In(loc).Format("2006-01-02T15:04:05.012Z"),
+		Property:  "pressure",
+		Unit:      "psi",
+		Value:     20,
+	}
+
+	tsa := []TimeSeries{
 		ts1,
 		ts2,
 	}
 
-	tsa := TimeSeries{ts}
 	// o1, _ := json.Marshal(ts1)
 	// o, _ := json.Marshal(tsa)
 	// fmt.Println("o1 - ", string(o1))

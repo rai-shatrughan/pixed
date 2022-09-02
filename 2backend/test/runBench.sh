@@ -1,1 +1,1 @@
-go test -bench=. -benchtime=60s
+go test -bench=. -benchtime=10s
