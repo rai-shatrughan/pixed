@@ -84,7 +84,7 @@ services:
   ts:
     build:
       context: ../
-      dockerfile: ./docker/app/Dockerfile-ts
+      dockerfile: ./0docker/app/Dockerfile-ts
     container_name: ts
     image: ts:v1
     entrypoint: ["/usr/bin/ts-server", "--host", "0.0.0.0", "--port", "8002", "--scheme", "http"]
@@ -101,7 +101,7 @@ services:
   cons:
     build:
       context: ../
-      dockerfile: ./docker/app//Dockerfile-cons
+      dockerfile: ./0docker/app/Dockerfile-cons
     container_name: cons
     image: cons:v1
     entrypoint: ["/usr/bin/consumer"]
