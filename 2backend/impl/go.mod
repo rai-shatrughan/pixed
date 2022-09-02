@@ -7,6 +7,7 @@ replace ts => ../svc/ts
 require (
 	github.com/go-openapi/errors v0.20.3
 	github.com/go-openapi/runtime v0.24.1
+	ts v0.0.0
 )
 
 require (
