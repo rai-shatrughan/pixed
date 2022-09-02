@@ -1,3 +1,4 @@
-FROM debian:bullseye-slim
+#FROM debian:bullseye-slim
+FROM scratch
 COPY 0docker/app/conf/config.yaml /conf/config.yaml
 COPY 0docker/app/bin/consumer /usr/bin/consumer
