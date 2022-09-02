@@ -18,7 +18,7 @@ func (c *Config) New() {
 	c.AddConfigPath("/etc/conf/") // path to look for the config file in
 	c.AddConfigPath("/conf")      // call multiple times to add many search paths
 	c.AddConfigPath("../conf/")
-	c.AddConfigPath("./conf/")
+	c.AddConfigPath("./mware/conf/")
 	c.SetConfigName("config")
 	c.SetConfigType("yaml")
 

@@ -10,6 +10,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	"impl"
 	"ts/models"
 	"ts/restapi/operations"
 )
@@ -50,6 +51,8 @@ func configureAPI(api *operations.TsAPI) http.Handler {
 	//
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
+
+	impl.Timeseries(api)
 
 	if api.GetTimeseriesDeviceIDHandler == nil {
 		api.GetTimeseriesDeviceIDHandler = operations.GetTimeseriesDeviceIDHandlerFunc(func(params operations.GetTimeseriesDeviceIDParams, principal *models.Principal) middleware.Responder {

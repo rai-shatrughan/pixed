@@ -10,8 +10,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 
 	mw "mware"
-	"svc/ts/models"
-	"svc/ts/restapi/operations"
+	"ts/models"
+	"ts/restapi/operations"
 )
 
 var (
@@ -21,22 +21,15 @@ var (
 )
 
 //Timeseries implements timeseries API middlewares
-func Timeseries(api *operations.TimeseriesAPI) {
+func Timeseries(api *operations.TsAPI) {
 	api.Logger = log.Printf
 
 	kf.Topic = &topic
 	kv.New()
 	kf.New()
 
-	sdb := mw.SessionDB{}
-	sdb.New()
-
-	sdb.Set("key1", "srkey12345")
-	tok := sdb.Get("key1")
-	api.Logger("Token--", tok)
-
 	api.APIKeyAuth = func(token string) (*models.Principal, error) {
-		if token == tok {
+		if token == "sr12345" {
 			prin := models.Principal(token)
 			return &prin, nil
 		}

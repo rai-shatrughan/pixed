@@ -2,11 +2,11 @@
 start=`date`
 echo "Start Time - " $start
 
-go-wrk -c 4000 -d 60 -T 30000 -M PUT \
-    -H "Authorization: Bearer sr12345" \
+go-wrk -c 8000 -d 10 -T 30000 -M PUT \
+    -H "X-API-Key: sr12345" \
     -H "Content-Type: application/json" \
     -body @json/ts.json \
-    http://172.18.0.21:8002/api/iottimeseries/v3/timeseries
+    http://172.18.0.21:8002/api/v1/timeseries/6fdae6af-226d-48bd-8b61-699758137eb3
 
 end=`date`
 echo "End Time - " $end
