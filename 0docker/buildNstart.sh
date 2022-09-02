@@ -39,17 +39,14 @@ crate_dir(){
 }
 
 4build_app_bin(){
-    mkdir -p 0docker/app/bin
-    mkdir -p 0docker/app/conf
-
     cd ../2backend
     echo "building go binary"
 
     cp -r mware/conf ../0docker/app
-    #go build -ldflags "-linkmode external -extldflags -static" -o docker/app/bin/consumer -a mware/consumer/main.go
-    #go build -ldflags "-linkmode external -extldflags -static" -o docker/app/bin/ts-server -a svc/ts/cmd/ts-server/main.go
-    go build -o ../0docker/app/bin/consumer mware/consumer/main.go
-    go build -o ../0docker/app/bin/ts-server svc/ts/cmd/ts-server/main.go 
+    go build -ldflags "-linkmode external -extldflags -static" -o ../0docker/app/bin/consumer -a mware/consumer/main.go
+    go build -ldflags "-linkmode external -extldflags -static" -o ../0docker/app/bin/ts-server -a svc/ts/cmd/ts-server/main.go
+    #go build -o ../0docker/app/bin/consumer mware/consumer/main.go
+    #go build -o ../0docker/app/bin/ts-server svc/ts/cmd/ts-server/main.go 
     cd ../0docker
 }
 
@@ -76,4 +73,4 @@ crate_dir(){
 4build_app_bin
 5recreate_containers
 #6setup_db
-#7clean_app_bin
+7clean_app_bin
