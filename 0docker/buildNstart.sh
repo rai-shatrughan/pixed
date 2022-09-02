@@ -43,8 +43,10 @@ crate_dir(){
     echo "building go binary"
 
     cp -r mware/conf ../0docker/app
-    go build -ldflags "-linkmode external -extldflags -static" -o ../0docker/app/bin/consumer -a mware/consumer/main.go
-    go build -ldflags "-linkmode external -extldflags -static" -o ../0docker/app/bin/ts-server -a svc/ts/cmd/ts-server/main.go
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../0docker/app/bin/consumer mware/consumer/main.go
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../0docker/app/bin/ts-server svc/ts/cmd/ts-server/main.go
+    # go build -ldflags "-linkmode external -extldflags -static" -o ../0docker/app/bin/consumer mware/consumer/main.go
+    # go build -ldflags "-linkmode external -extldflags -static" -o ../0docker/app/bin/ts-server svc/ts/cmd/ts-server/main.go
     #go build -o ../0docker/app/bin/consumer mware/consumer/main.go
     #go build -o ../0docker/app/bin/ts-server svc/ts/cmd/ts-server/main.go 
     cd ../0docker
