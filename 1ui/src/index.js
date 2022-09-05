@@ -6,22 +6,26 @@ import "purecss/build/base-min.css";
 import "purecss/build/grids-min.css";
 import "purecss/build/grids-responsive-min.css";
 
-import Header from "./comp/Header";
-import Home from "./comp/Home";
-import Skills from "./comp/Skills";
-import TechStack from "./comp/TechStack";
-import Domains from "./comp/Domains";
-import VR from "./comp/VR";
-import Video from "./comp/Video";
+import {
+  Header, 
+  Home, 
+  Skills, 
+  TechStack, 
+  Domains, 
+  VR, 
+  Video, 
+  Theme
+} from "./comp/CompList";
 
 const menus = ["Home", "Skills", "TechStack", "Domains", "VR", "Video"];
 const compMap = { Home, Skills, TechStack, Domains, VR, Video };
 
 class Index extends React.Component {
+
   constructor(props) {
     super(props);
     this.headerClicked = this.headerClicked.bind(this);
-    this.state = { show: "Home" };
+    this.state = {show: "Home"};
   }
 
   headerClicked(menu, e) {
@@ -30,7 +34,7 @@ class Index extends React.Component {
   }
 
   render() {
-    const TagName = compMap[this.state.show];
+    const VisibleComponent = compMap[this.state.show];
 
     return (
       <div>
@@ -43,7 +47,8 @@ class Index extends React.Component {
             ></Header>
           ))}
         </div>
-        <TagName />
+        <Theme />
+        <VisibleComponent />
       </div>
     );
   }

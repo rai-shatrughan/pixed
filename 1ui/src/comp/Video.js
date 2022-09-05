@@ -31,7 +31,7 @@ export default class Video extends React.Component {
             
             {this.state.items.map((item) =>
                 <div className="pure-u-1-1 pure-u-md-1-2 pure-u-lg-1-3 videoGrid"> 
-                    <video className="videoItem" controls key={item}>
+                    <video className="videoItem" controls key={item} controlsList="nodownload">
                         <source src={this.videoPath(item)} type="video/mp4"/>
                     </video>
                 </div>
