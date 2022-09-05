@@ -16,7 +16,7 @@ export default class Video extends React.Component {
     }
 
     videoPath = (item) => {
-        let path = "http://172.18.0.22:8003/"+item+".mp4"
+        let path = "http://localhost:8003/"+item+".mp4"
         // console.log(path)
         return path
     }
