@@ -24,15 +24,15 @@ export default class Video extends React.Component {
     render() {
       return (
         <div>
-            <form class="pure-form searchVideoForm">
+            <form className="pure-form searchVideoForm">
                 <input type="text" className="pure-input-1 searchVideoTextBox" placeholder="search video" onChange={evt => this.filterVideo(evt)}/>
                 <br />
             </form>
             
             {this.state.items.map((item) =>
-                <div className="pure-u-1-1 pure-u-md-1-2 pure-u-lg-1-3 videoGrid"> 
-                    <video className="videoItem" controls key={item} controlsList="nodownload">
-                        <source src={this.videoPath(item)} type="video/mp4"/>
+                <div className="pure-u-1-1 pure-u-md-1-2 pure-u-lg-1-3 videoGrid" key={item}> 
+                    <video className="videoItem" controls controlsList="nodownload" key={item}>
+                        <source src={this.videoPath(item)} type="video/mp4" key={item}/>
                     </video>
                 </div>
             )}
