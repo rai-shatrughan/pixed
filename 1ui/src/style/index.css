@@ -64,4 +64,25 @@ a:active {
     white-space: nowrap;
     position: relative;
 }
+
+.searchVideoForm {
+    padding-top: 50px;
+    width: 50%;
+    margin-left: 25%;
+}
+
+.searchVideoTextBox {
+    background: var(--background-color);
+    color: var(--font-color);
+}
+
+.videoGrid {
+    margin-left: 25%;
+    margin-top: 25px;
+}
+
+.videoItem {
+    width: 65%;
+    height: 400;
+}
       

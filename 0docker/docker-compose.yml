@@ -113,6 +113,21 @@ services:
     depends_on:
       - kafka
 
+  strm:
+    build:
+      context: ../
+      dockerfile: ./0docker/app/Dockerfile-strm
+    container_name: strm
+    image: strm:v1
+    entrypoint: ["/usr/bin/strm"]
+    expose:
+      - 8003
+    volumes:
+      - /data/asset:/data/asset
+    networks:
+      sr_cluster_network:
+        ipv4_address: ${SR_STRM_IP}
+
 networks:
   sr_cluster_network:
     external: true

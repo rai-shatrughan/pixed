@@ -12,9 +12,10 @@ import Skills from "./comp/Skills";
 import TechStack from "./comp/TechStack";
 import Domains from "./comp/Domains";
 import VR from "./comp/VR";
+import Video from "./comp/Video";
 
-const menus = ["Home", "Skills", "TechStack", "Domains", "VR"];
-const compMap = { Home, Skills, TechStack, Domains, VR };
+const menus = ["Home", "Skills", "TechStack", "Domains", "VR", "Video"];
+const compMap = { Home, Skills, TechStack, Domains, VR, Video };
 
 class Index extends React.Component {
   constructor(props) {

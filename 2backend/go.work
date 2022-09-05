@@ -6,4 +6,5 @@ use (
     ./test
 	./svc/ts
     ./svc/gateway
+    ./svc/strm
 )
