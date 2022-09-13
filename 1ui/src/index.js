@@ -39,7 +39,6 @@ class Index extends React.Component {
     return (
       <div>
         <div className="pure-menu pure-menu-horizontal">
-        <Theme />
           {menus.map((menu) => (
             <Header
               menu={menu}
@@ -47,7 +46,8 @@ class Index extends React.Component {
               onClicked={(e) => this.headerClicked(menu, e)}
             />
           ))}
-        </div>
+        </div>   
+        <Theme />     
         <VisibleComponent />
       </div>
     );

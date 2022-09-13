@@ -70,16 +70,17 @@ a:active {
 }
 
 .theme-button {
-  padding: 10px;
-  color: var(--font-color);
+  right: 10px;
+  top: 0px;
   background-color: var(--background-color);
   border: none;
-  cursor:pointer;
+  cursor:pointer;  
+  position: absolute;
 }
 
 .pure-menu-horizontal {
     display: inline-block;
-    width: 100vw;
+    width: 90vw;
     vertical-align: middle;
     -webkit-font-smoothing: antialiased;
     background-color: var(--background-color);
