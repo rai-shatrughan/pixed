@@ -69,6 +69,14 @@ a:active {
     color: var(--font-color);
 }
 
+.theme-button {
+  padding: 10px;
+  color: var(--font-color);
+  background-color: var(--background-color);
+  border: none;
+  cursor:pointer;
+}
+
 .pure-menu-horizontal {
     display: inline-block;
     width: 100vw;
