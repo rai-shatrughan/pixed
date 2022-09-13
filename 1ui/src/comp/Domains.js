@@ -18,8 +18,14 @@ export default class Domains extends React.Component {
 }
 
 function drawDomains(){
+    var myChart;
     var chartDom = document.getElementById('ecDomains');
-    var myChart = echarts.init(chartDom);
+    var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
+    if (dark) {
+      myChart = echarts.init(chartDom, 'dark');
+    } else {
+      myChart = echarts.init(chartDom);
+    }
     var option;
 
     const graph = json;

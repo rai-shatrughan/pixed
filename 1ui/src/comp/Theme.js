@@ -33,12 +33,12 @@ export default class Theme extends React.Component {
 
   render() {
     return (        
-      <a className="pure-menu-heading pure-menu-link" href="#" onClick={this.toggleTheme}>
+      <button className="pure-menu-heading pure-menu-link" onClick={this.toggleTheme}>
         { this.state.dark ?
           <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" width="10" height="10" src={logoDark} /> :
           <img className="theme-icon" title="ToggleTheme" alt= "ToggleTheme" width="10" height="10" src={logoLight} /> 
         }
-      </a> 
+      </button> 
     );
   }
 }

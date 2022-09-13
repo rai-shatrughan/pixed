@@ -6,6 +6,10 @@ export default class Skills extends React.Component {
     componentDidMount() {
         drawSkills();
     }
+
+    componentDidUpdate() {
+      drawSkills();
+    }
   
     render() {
       return (
@@ -35,8 +39,14 @@ function drawSkills(){
 }
 
 function drawSkill(elementId, chartName, score){
+  var myChart;
   var chartDom = document.getElementById(elementId);
-  var myChart = echarts.init(chartDom);
+  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
+  if (dark) {
+    myChart = echarts.init(chartDom, 'dark');
+  } else {
+    myChart = echarts.init(chartDom);
+  }
   var option;
 
   option = {

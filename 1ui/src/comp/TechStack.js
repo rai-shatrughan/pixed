@@ -18,8 +18,15 @@ export default class TechStack extends React.Component {
 }
 
 function drawTechStack(){
+  var myChart;
   var chartDom = document.getElementById('ecTechStack');
-  var myChart = echarts.init(chartDom);
+  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
+  if (dark) {
+    myChart = echarts.init(chartDom, 'dark');
+  } else {
+    myChart = echarts.init(chartDom);
+  }
+  
   var option;
 
   const data = json;

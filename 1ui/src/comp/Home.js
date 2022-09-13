@@ -25,8 +25,14 @@ function drawHome(){
 }
 
 function drawHomeBar(){
+  var myChart;
   var chartDom = document.getElementById('ecHomeBar');
-  var myChart = echarts.init(chartDom);
+  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
+  if (dark) {
+    myChart = echarts.init(chartDom, 'dark');
+  } else {
+    myChart = echarts.init(chartDom);
+  }
   var option;
 
   option = {
@@ -76,8 +82,14 @@ function drawHomeBar(){
 }
 
 function drawHomeName(){
+  var myChart;
   var chartDom = document.getElementById('ecHomeName');
-  var myChart = echarts.init(chartDom);
+  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
+  if (dark) {
+    myChart = echarts.init(chartDom, 'dark');
+  } else {
+    myChart = echarts.init(chartDom);
+  }
   var option;
 
   option = {
@@ -93,7 +105,7 @@ function drawHomeName(){
             lineDash: [0, 200],
             lineDashOffset: 0,
             fill: 'transparent',
-            stroke: 'black',
+            stroke: 'orange',
             lineWidth: 1
           },
           keyframeAnimation: {
@@ -132,8 +144,14 @@ function drawHomeName(){
 }
 
 function drawHomeTag(){
+  var myChart;
   var chartDom = document.getElementById('ecHomeTag');
-  var myChart = echarts.init(chartDom);
+  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
+  if (dark) {
+    myChart = echarts.init(chartDom, 'dark');
+  } else {
+    myChart = echarts.init(chartDom);
+  }
   var option;
 
   option = {
@@ -149,7 +167,7 @@ function drawHomeTag(){
             lineDash: [0, 100],
             lineDashOffset: 0,
             fill: 'transparent',
-            stroke: 'black',
+            stroke: '#12cdea',
             lineWidth: 1
           },
           keyframeAnimation: {
