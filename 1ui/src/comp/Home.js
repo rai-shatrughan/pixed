@@ -7,6 +7,10 @@ export default class Home extends React.Component {
     drawHome(this.props.theme);
   }
 
+  componentDidUpdate() {
+    drawHome(this.props.theme);
+  }
+
   render() {
     return (
       <div className="pure-g g1 home">
@@ -27,6 +31,7 @@ function drawHome(theme) {
 function drawHomeBar(theme) {
   var myChart;
   var chartDom = document.getElementById('ecHomeBar');
+  echarts.dispose(chartDom);
   if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {
@@ -83,6 +88,7 @@ function drawHomeBar(theme) {
 function drawHomeName(theme) {
   var myChart;
   var chartDom = document.getElementById('ecHomeName');
+  echarts.dispose(chartDom);
   if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {
@@ -144,6 +150,7 @@ function drawHomeName(theme) {
 function drawHomeTag(theme) {
   var myChart;
   var chartDom = document.getElementById('ecHomeTag');
+  echarts.dispose(chartDom);
   if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {
