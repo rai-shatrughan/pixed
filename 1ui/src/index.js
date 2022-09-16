@@ -1,5 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { Provider } from 'react-redux';
+import { store } from './app/store';
 
 import "./style/index.css";
 import "purecss/build/base-min.css";
@@ -37,19 +39,21 @@ class Index extends React.Component {
     const VisibleComponent = compMap[this.state.show];
 
     return (
-      <div>
-        <div className="pure-menu pure-menu-horizontal">
-          {menus.map((menu) => (
-            <Header
-              menu={menu}
-              key={menu}
-              onClicked={(e) => this.headerClicked(menu, e)}
-            />
-          ))}
-        </div>   
-        <Theme />     
-        <VisibleComponent />
-      </div>
+      <Provider store={store}>
+        <div>
+          <div className="pure-menu pure-menu-horizontal">
+            {menus.map((menu) => (
+              <Header
+                menu={menu}
+                key={menu}
+                onClicked={(e) => this.headerClicked(menu, e)}
+              />
+            ))}
+            <Theme />    
+          </div>
+          <VisibleComponent />
+        </div>
+      </Provider>
     );
   }
 }

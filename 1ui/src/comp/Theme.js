@@ -35,8 +35,8 @@ export default class Theme extends React.Component {
     return (        
       <button className="theme-button" onClick={this.toggleTheme}>
         { this.state.dark ?
-          <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" width="10" height="10" src={logoDark} /> :
-          <img className="theme-icon" title="ToggleTheme" alt= "ToggleTheme" width="10" height="10" src={logoLight} /> 
+          <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoDark} /> :
+          <img className="theme-icon" title="ToggleTheme" alt= "ToggleTheme" src={logoLight} /> 
         }
       </button> 
     );

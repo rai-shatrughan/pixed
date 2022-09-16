@@ -70,6 +70,8 @@ a:active {
 }
 
 .theme-button {
+  height: 1em;
+  width: 1em;
   right: 10px;
   top: 0px;
   background-color: var(--background-color);
@@ -78,9 +80,14 @@ a:active {
   position: absolute;
 }
 
+.theme-icon {
+  height: inherit;
+  width: inherit;
+}
+
 .pure-menu-horizontal {
     display: inline-block;
-    width: 90vw;
+    width: 95vw;
     vertical-align: middle;
     -webkit-font-smoothing: antialiased;
     background-color: var(--background-color);
