@@ -1,20 +1,10 @@
 import React from 'react';
 import * as echarts from 'echarts';
-import { getTheme } from './Theme';
 
 export default class Home extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = { theme: getTheme() };
-  }
-
   componentDidMount() {
-    if (this.state.theme === 'dark') {
-      drawHome('dark');
-    } else {
-      drawHome('light');
-    }
+    drawHome(this.props.theme);
   }
 
   render() {

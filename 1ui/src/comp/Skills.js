@@ -1,20 +1,14 @@
 import React from 'react';
-import { getTheme } from './Theme';
 import * as echarts from 'echarts';
 
 export default class Skills extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = { theme: getTheme() };
+  componentDidMount() {
+    drawSkills(this.props.theme)
   }
 
-  componentDidMount() {
-    if (this.state.theme === 'dark') {
-      drawSkills('dark');
-    } else {
-      drawSkills('light');
-    }
+  componentDidUpdate() {
+    drawSkills(this.props.theme)
   }
 
   render() {
@@ -47,6 +41,7 @@ function drawSkills(theme) {
 function drawSkill(theme, elementId, chartName, score) {
   var myChart;
   var chartDom = document.getElementById(elementId);
+  echarts.dispose(chartDom);
   if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {

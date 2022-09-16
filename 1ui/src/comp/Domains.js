@@ -1,21 +1,15 @@
 import React from 'react';
 import * as echarts from 'echarts';
-import { getTheme } from './Theme';
 import json from '../data/domains.json';
 
 export default class Domains extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = { theme: getTheme() };
+    componentDidMount() {
+        drawDomains(this.props.theme);
     }
 
-    componentDidMount() {
-        if (this.state.theme === 'dark') {
-            drawDomains('dark');
-        } else {
-            drawDomains('light');
-        }
+    componentDidUpdate() {
+        drawDomains(this.props.theme);
     }
 
     render() {
@@ -30,6 +24,7 @@ export default class Domains extends React.Component {
 function drawDomains(theme) {
     var myChart;
     var chartDom = document.getElementById('ecDomains');
+    echarts.dispose(chartDom);
     if (theme === 'dark') {
         myChart = echarts.init(chartDom, 'dark');
     } else {

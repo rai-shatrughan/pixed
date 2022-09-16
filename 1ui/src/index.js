@@ -8,13 +8,23 @@ import {
   Theme
 } from "./comp/CompList";
 import { Menus, CompMap } from './app/constants';
+import { GetTheme, ToggleTheme } from './comp/Theme';
 
 class Index extends React.Component {
 
   constructor(props) {
     super(props);
     this.headerClicked = this.headerClicked.bind(this);
-    this.state = { show: "Home" };
+    this.toggleTheme = this.toggleTheme.bind(this);
+    this.state = {
+      show: "Home",
+      theme: GetTheme(),
+    };
+  }
+
+  toggleTheme(){
+    ToggleTheme()
+    this.setState({ theme: GetTheme() });
   }
 
   headerClicked(menu, e) {
@@ -37,11 +47,11 @@ class Index extends React.Component {
             />
           ))}
 
-          <Theme />
+          <Theme theme={this.state.theme} onClicked={this.toggleTheme}/>
 
         </div>
 
-        <VisibleComponent />
+        <VisibleComponent theme={this.state.theme}/>
       </div>
     );
   }

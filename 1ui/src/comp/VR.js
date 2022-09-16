@@ -1,12 +1,10 @@
 import React from 'react';
 import * as THREE from 'three';
-import { setTheme } from './Theme';
 
 export default class VR extends React.Component {
 
     componentDidMount() {
         drawVR();
-        setTheme('dark');
     }
 
     render() {

@@ -1,12 +1,10 @@
 import {
-    Header,
     Home,
     Skills,
     TechStack,
     Domains,
     VR,
-    Video,
-    Theme
+    Video
 } from "../comp/CompList";
 
 export const Menus = ["Home", "Skills", "TechStack", "Domains", "VR", "Video"];

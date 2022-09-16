@@ -11,10 +11,6 @@ export default class Video extends React.Component {
         };
     }
 
-    componentDidMount() {
-        // drawHome();
-    }
-
     videoPath = (item) => {
         let path = "http://localhost:8003/" + item + ".mp4"
         // console.log(path)
