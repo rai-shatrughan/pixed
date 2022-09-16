@@ -4,36 +4,36 @@ import { getTheme } from './Theme';
 import json from '../data/domains.json';
 
 export default class Domains extends React.Component {
-  
+
     constructor(props) {
         super(props);
         this.state = { theme: getTheme() };
     }
 
     componentDidMount() {
-        if (this.state.theme === 'dark'){
+        if (this.state.theme === 'dark') {
             drawDomains('dark');
-          } else {
+        } else {
             drawDomains('light');
-          }
+        }
     }
-  
+
     render() {
-      return (
-        <div className="pure-g g4 domains">
-            <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecDomains"></div>
-        </div>
-      );
+        return (
+            <div className="pure-g g4 domains">
+                <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecDomains"></div>
+            </div>
+        );
     }
 }
 
-function drawDomains(theme){
+function drawDomains(theme) {
     var myChart;
     var chartDom = document.getElementById('ecDomains');
     if (theme === 'dark') {
-      myChart = echarts.init(chartDom, 'dark');
+        myChart = echarts.init(chartDom, 'dark');
     } else {
-      myChart = echarts.init(chartDom);
+        myChart = echarts.init(chartDom);
     }
     var option;
 
@@ -44,60 +44,60 @@ function drawDomains(theme){
     myChart.hideLoading();
     graph.nodes.forEach(function (node) {
         node.label = {
-        show: node.symbolSize > 1
+            show: node.symbolSize > 1
         };
     });
     option = {
         title: {
-        // text: 'Domains',
-        // top: 'top',
-        // left: 'left',
-        // z: 2,
+            // text: 'Domains',
+            // top: 'top',
+            // left: 'left',
+            // z: 2,
         },
         textStyle: {
             fontSize: 12,
-        },        
+        },
         tooltip: {},
         legend: [
-        {
-            data: graph.categories.map(function (a) {
-            return a.name;
-            }),
-            orient: "horizontal",
-            left: "center",
-            top: 0,
-        }
+            {
+                data: graph.categories.map(function (a) {
+                    return a.name;
+                }),
+                orient: "horizontal",
+                left: "center",
+                top: 0,
+            }
         ],
         animationDurationUpdate: 1500,
         animationEasingUpdate: 'quinticInOut',
         series: [
-        {
-            name: 'Domain',
-            type: 'graph',
-            layout: 'circular',
-            circular: {
-            rotateLabel: true
-            },
-            data: graph.nodes,
-            links: graph.links,
-            categories: graph.categories,
-            roam: true,
-            label: {
-            position: 'left',
-            formatter: '{b}'
-            },
-            lineStyle: {
-            color: 'source',
-            curveness: 0.3
-            },
-            labelLayout: {
-                hideOverlap: true
-            },
-            scaleLimit: {
-                min: 0.4,
-                max: 0.8
+            {
+                name: 'Domain',
+                type: 'graph',
+                layout: 'circular',
+                circular: {
+                    rotateLabel: true
+                },
+                data: graph.nodes,
+                links: graph.links,
+                categories: graph.categories,
+                roam: true,
+                label: {
+                    position: 'left',
+                    formatter: '{b}'
+                },
+                lineStyle: {
+                    color: 'source',
+                    curveness: 0.3
+                },
+                labelLayout: {
+                    hideOverlap: true
+                },
+                scaleLimit: {
+                    min: 0.4,
+                    max: 0.8
+                }
             }
-        }
         ]
     };
     myChart.setOption(option);

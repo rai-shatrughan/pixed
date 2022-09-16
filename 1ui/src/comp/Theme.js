@@ -25,22 +25,22 @@ export default class Theme extends React.Component {
 
   toggleTheme() {
     if (getTheme() === 'dark') {
-        setTheme('light');
-        this.setState({theme: getTheme()});
+      setTheme('light');
+      this.setState({ theme: getTheme() });
     } else {
-        setTheme('dark');
-        this.setState({theme: getTheme()});
+      setTheme('dark');
+      this.setState({ theme: getTheme() });
     }
   }
 
   render() {
-    return (        
+    return (
       <button className="theme-button" onClick={this.toggleTheme}>
-        { this.state.theme === 'dark'  ?
+        {this.state.theme === 'dark' ?
           <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoDark} /> :
-          <img className="theme-icon" title="ToggleTheme" alt= "ToggleTheme" src={logoLight} /> 
+          <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoLight} />
         }
-      </button> 
+      </button>
     );
   }
 }

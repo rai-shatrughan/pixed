@@ -1,33 +1,20 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-
 import "./style/index.css";
 import "purecss/build/base-min.css";
-import "purecss/build/grids-min.css";
 import "purecss/build/grids-responsive-min.css";
-
 import {
-  Header, 
-  Home, 
-  Skills, 
-  TechStack, 
-  Domains, 
-  VR, 
-  Video, 
+  Header,
   Theme
 } from "./comp/CompList";
-
-const menus = ["Home", "Skills", "TechStack", "Domains", "VR", "Video"];
-const compMap = { Home, Skills, TechStack, Domains, VR, Video };
+import { Menus, CompMap } from './app/constants';
 
 class Index extends React.Component {
 
   constructor(props) {
     super(props);
     this.headerClicked = this.headerClicked.bind(this);
-    this.state = {show: "Home"};
+    this.state = { show: "Home" };
   }
 
   headerClicked(menu, e) {
@@ -36,24 +23,26 @@ class Index extends React.Component {
   }
 
   render() {
-    const VisibleComponent = compMap[this.state.show];
+    const VisibleComponent = CompMap[this.state.show];
 
     return (
-      <Provider store={store}>
-        <div>
-          <div className="pure-menu pure-menu-horizontal">
-            {menus.map((menu) => (
-              <Header
-                menu={menu}
-                key={menu}
-                onClicked={(e) => this.headerClicked(menu, e)}
-              />
-            ))}
-            <Theme />    
-          </div>
-          <VisibleComponent />
+      <div>
+        <div className="pure-menu pure-menu-horizontal">
+
+          {Menus.map((menu) => (
+            <Header
+              menu={menu}
+              key={menu}
+              onClicked={(e) => this.headerClicked(menu, e)}
+            />
+          ))}
+
+          <Theme />
+
         </div>
-      </Provider>
+
+        <VisibleComponent />
+      </div>
     );
   }
 }

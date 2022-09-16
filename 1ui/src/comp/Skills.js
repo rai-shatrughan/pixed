@@ -3,48 +3,48 @@ import { getTheme } from './Theme';
 import * as echarts from 'echarts';
 
 export default class Skills extends React.Component {
-  
-    constructor(props) {
-      super(props);
-      this.state = { theme: getTheme() };
-    }
 
-    componentDidMount() {
-      if (this.state.theme === 'dark'){
-        drawSkills('dark');
-      } else {
-        drawSkills('light');
-      }
-    }
+  constructor(props) {
+    super(props);
+    this.state = { theme: getTheme() };
+  }
 
-    render() {
-      return (
-        <div className="pure-g g2 skills">
-            {Array.from(skills.keys()).map((key) => 
-                <div className="pure-u-1 pure-u-md-1-3 skillsItem" id={key} key={key}></div>
-            )}          
-        </div>
-      );
+  componentDidMount() {
+    if (this.state.theme === 'dark') {
+      drawSkills('dark');
+    } else {
+      drawSkills('light');
     }
+  }
+
+  render() {
+    return (
+      <div className="pure-g g2 skills">
+        {Array.from(skills.keys()).map((key) =>
+          <div className="pure-u-1 pure-u-md-1-3 skillsItem" id={key} key={key}></div>
+        )}
+      </div>
+    );
+  }
 }
 
 const skills = new Map([
-    ['MicroService', 70],
-    ['Observability', 75],
-    ['Streaming', 75],
-    ['NLP', 60],
-    ['RxJava', 60],
-    ['OpenCV', 60]
+  ['MicroService', 70],
+  ['Observability', 75],
+  ['Streaming', 75],
+  ['NLP', 60],
+  ['RxJava', 60],
+  ['OpenCV', 60]
 ]);
 
 
-function drawSkills(theme){
-    for (const [key, value] of skills.entries()) {
-        drawSkill(theme, key, key, value)
-    }
+function drawSkills(theme) {
+  for (const [key, value] of skills.entries()) {
+    drawSkill(theme, key, key, value)
+  }
 }
 
-function drawSkill(theme, elementId, chartName, score){
+function drawSkill(theme, elementId, chartName, score) {
   var myChart;
   var chartDom = document.getElementById(elementId);
   if (theme === 'dark') {
@@ -66,11 +66,11 @@ function drawSkill(theme, elementId, chartName, score){
           show: true
         },
         axisLabel: {
-            fontSize: 10
+          fontSize: 10
         },
         title: {
-            show: true,
-            fontSize: 11
+          show: true,
+          fontSize: 11
         },
         detail: {
           valueAnimation: true,

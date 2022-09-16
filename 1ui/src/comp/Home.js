@@ -8,33 +8,33 @@ export default class Home extends React.Component {
     super(props);
     this.state = { theme: getTheme() };
   }
-  
-    componentDidMount() {
-      if (this.state.theme === 'dark'){
-        drawHome('dark');
-      } else {
-        drawHome('light');
-      }
+
+  componentDidMount() {
+    if (this.state.theme === 'dark') {
+      drawHome('dark');
+    } else {
+      drawHome('light');
     }
-  
-    render() {
-      return (
-        <div className="pure-g g1 home">
-            <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeBar"></div>
-            <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeName"></div>
-            <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeTag"></div>
-        </div>
-      );
-    }
+  }
+
+  render() {
+    return (
+      <div className="pure-g g1 home">
+        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeBar"></div>
+        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeName"></div>
+        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeTag"></div>
+      </div>
+    );
+  }
 }
-  
-function drawHome(theme){
+
+function drawHome(theme) {
   drawHomeBar(theme);
   drawHomeName(theme);
   drawHomeTag(theme);
 }
 
-function drawHomeBar(theme){
+function drawHomeBar(theme) {
   var myChart;
   var chartDom = document.getElementById('ecHomeBar');
   if (theme === 'dark') {
@@ -90,7 +90,7 @@ function drawHomeBar(theme){
   option && myChart.setOption(option);
 }
 
-function drawHomeName(theme){
+function drawHomeName(theme) {
   var myChart;
   var chartDom = document.getElementById('ecHomeName');
   if (theme === 'dark') {
@@ -151,7 +151,7 @@ function drawHomeName(theme){
   option && myChart.setOption(option);
 }
 
-function drawHomeTag(theme){
+function drawHomeTag(theme) {
   var myChart;
   var chartDom = document.getElementById('ecHomeTag');
   if (theme === 'dark') {

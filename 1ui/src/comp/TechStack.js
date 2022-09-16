@@ -5,29 +5,29 @@ import json from '../data/techstack.json';
 
 export default class TechStack extends React.Component {
 
-    constructor(props) {
-      super(props);
-      this.state = { theme: getTheme() };
-    }
+  constructor(props) {
+    super(props);
+    this.state = { theme: getTheme() };
+  }
 
-    componentDidMount() {
-      if (this.state.theme === 'dark'){
-        drawTechStack('dark');
-      } else {
-        drawTechStack('light');
-      }
+  componentDidMount() {
+    if (this.state.theme === 'dark') {
+      drawTechStack('dark');
+    } else {
+      drawTechStack('light');
     }
-  
-    render() {
-      return (
-        <div className="pure-g g3 techStack">
-            <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecTechStack"></div>
-        </div>
-      );
-    }
+  }
+
+  render() {
+    return (
+      <div className="pure-g g3 techStack">
+        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecTechStack"></div>
+      </div>
+    );
+  }
 }
 
-function drawTechStack(theme){
+function drawTechStack(theme) {
   var myChart;
   var chartDom = document.getElementById('ecTechStack');
   if (theme === 'dark') {
@@ -35,14 +35,14 @@ function drawTechStack(theme){
   } else {
     myChart = echarts.init(chartDom);
   }
-  
+
   var option;
 
   const data = json;
 
   option = {
     title: {
-    //   text: 'TechStack',
+      //   text: 'TechStack',
       textStyle: {
         fontSize: 14,
         align: 'center'
