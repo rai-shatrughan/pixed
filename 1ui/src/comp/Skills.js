@@ -1,16 +1,22 @@
 import React from 'react';
+import { getTheme } from './Theme';
 import * as echarts from 'echarts';
 
 export default class Skills extends React.Component {
   
-    componentDidMount() {
-        drawSkills();
+    constructor(props) {
+      super(props);
+      this.state = { theme: getTheme() };
     }
 
-    componentDidUpdate() {
-      drawSkills();
+    componentDidMount() {
+      if (this.state.theme === 'dark'){
+        drawSkills('dark');
+      } else {
+        drawSkills('light');
+      }
     }
-  
+
     render() {
       return (
         <div className="pure-g g2 skills">
@@ -32,17 +38,16 @@ const skills = new Map([
 ]);
 
 
-function drawSkills(){
+function drawSkills(theme){
     for (const [key, value] of skills.entries()) {
-        drawSkill(key, key, value)
+        drawSkill(theme, key, key, value)
     }
 }
 
-function drawSkill(elementId, chartName, score){
+function drawSkill(theme, elementId, chartName, score){
   var myChart;
   var chartDom = document.getElementById(elementId);
-  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
-  if (dark) {
+  if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {
     myChart = echarts.init(chartDom);

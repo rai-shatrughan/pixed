@@ -1,11 +1,11 @@
-.theme-light {
+.light {
   --color-primary: #0060df;       /* light blue */ 
   --color-accent: #fd6f53;        /* orange */
   --background-color: #ffffff;    /* white */
   --font-color: #000000;          /* black */
 }
 
-.theme-dark {
+.dark {
   --color-primary: #7ec5a6;       /* light green */    
   --color-accent: #12cdea;        /* sky blue */
   --background-color: #100c2a;    /* black */

@@ -1,10 +1,20 @@
 import React from 'react';
 import * as echarts from 'echarts';
+import { getTheme } from './Theme';
 
 export default class Home extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = { theme: getTheme() };
+  }
   
     componentDidMount() {
-        drawHome();
+      if (this.state.theme === 'dark'){
+        drawHome('dark');
+      } else {
+        drawHome('light');
+      }
     }
   
     render() {
@@ -18,17 +28,16 @@ export default class Home extends React.Component {
     }
 }
   
-function drawHome(){
-  drawHomeBar();
-  drawHomeName();
-  drawHomeTag();
+function drawHome(theme){
+  drawHomeBar(theme);
+  drawHomeName(theme);
+  drawHomeTag(theme);
 }
 
-function drawHomeBar(){
+function drawHomeBar(theme){
   var myChart;
   var chartDom = document.getElementById('ecHomeBar');
-  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
-  if (dark) {
+  if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {
     myChart = echarts.init(chartDom);
@@ -81,11 +90,10 @@ function drawHomeBar(){
   option && myChart.setOption(option);
 }
 
-function drawHomeName(){
+function drawHomeName(theme){
   var myChart;
   var chartDom = document.getElementById('ecHomeName');
-  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
-  if (dark) {
+  if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {
     myChart = echarts.init(chartDom);
@@ -143,11 +151,10 @@ function drawHomeName(){
   option && myChart.setOption(option);
 }
 
-function drawHomeTag(){
+function drawHomeTag(theme){
   var myChart;
   var chartDom = document.getElementById('ecHomeTag');
-  var dark = (localStorage.getItem('theme') === 'theme-dark') ? true : false;
-  if (dark) {
+  if (theme === 'dark') {
     myChart = echarts.init(chartDom, 'dark');
   } else {
     myChart = echarts.init(chartDom);
