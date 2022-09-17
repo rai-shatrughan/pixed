@@ -5,7 +5,7 @@ import "purecss/build/base-min.css";
 import "purecss/build/grids-responsive-min.css";
 import { Header, Theme } from "./comp/CompList";
 import { Menus, CompMap } from "./app/constants";
-import { getTheme, toggleTheme } from "./comp/Theme";
+import { getTheme } from "./comp/Theme";
 
 class Index extends React.Component {
     constructor(props) {
@@ -37,10 +37,9 @@ class Index extends React.Component {
 
                     <Theme
                         theme={this.state.theme}
-                        onClicked={() => {
-                            toggleTheme();
-                            this.setState({ theme: getTheme() });
-                        }}
+                        onClicked={() => 
+                            this.setState({ theme: getTheme() })
+                        }
                     />
                 </div>
 

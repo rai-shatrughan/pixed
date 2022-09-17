@@ -25,7 +25,10 @@ export default class Theme extends React.Component {
         return (
             <button
                 className="theme-button"
-                onClick={this.props.onClicked}>
+                onClick={() => {
+                    toggleTheme();
+                    this.props.onClicked();
+                }}>
 
                 {this.props.theme === 'dark' ?
                     <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoDark} /> :
