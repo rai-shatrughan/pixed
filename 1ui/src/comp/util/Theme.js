@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import logoDark from '../../assets/theme-dark.gif';
 import logoLight from '../../assets/theme-light.gif';
 
@@ -19,22 +19,24 @@ export function toggleTheme() {
     }
 }
 
-export default class Theme extends React.Component {
+export default function Theme(props) {
 
-    render() {
-        return (
-            <button
-                className="theme-button"
-                onClick={() => {
-                    toggleTheme();
-                    this.props.onClicked();
-                }}>
+    useEffect(() => {
+        setTheme(props.theme);
+    });
 
-                {this.props.theme === 'dark' ?
-                    <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoDark} /> :
-                    <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoLight} />
-                }
-            </button>
-        );
-    }
+    return (
+        <button
+            className="theme-button"
+            onClick={() => {
+                toggleTheme();
+                props.onClicked();
+            }}>
+
+            {props.theme === 'dark' ?
+                <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoDark} /> :
+                <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoLight} />
+            }
+        </button>
+    );
 }
