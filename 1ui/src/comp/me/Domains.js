@@ -1,6 +1,6 @@
 import React from 'react';
 import * as echarts from 'echarts';
-import json from '../data/domains.json';
+import json from '../../data/domains.json';
 
 export default class Domains extends React.Component {
 

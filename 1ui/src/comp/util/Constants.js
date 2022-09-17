@@ -5,7 +5,7 @@ import {
     Domains,
     VR,
     Video
-} from "../comp/CompList";
+} from "../CompList";
 
 export const Menus = ["Home", "Skills", "TechStack", "Domains", "VR", "Video"];
 export const CompMap = { Home, Skills, TechStack, Domains, VR, Video };

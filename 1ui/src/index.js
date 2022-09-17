@@ -3,9 +3,13 @@ import { createRoot } from "react-dom/client";
 import "./style/index.css";
 import "purecss/build/base-min.css";
 import "purecss/build/grids-responsive-min.css";
-import { Header, Theme } from "./comp/CompList";
-import { Menus, CompMap } from "./app/constants";
-import { getTheme } from "./comp/Theme";
+import { 
+    Header, 
+    Theme, 
+    getTheme,
+    Menus,
+    CompMap 
+} from "./comp/CompList";
 
 class Index extends React.Component {
     constructor(props) {

@@ -1,6 +1,6 @@
 import React from "react";
-import logoDark from '../assets/theme-dark.gif';
-import logoLight from '../assets/theme-light.gif';
+import logoDark from '../../assets/theme-dark.gif';
+import logoLight from '../../assets/theme-light.gif';
 
 export function setTheme(themeName) {
     localStorage.setItem('theme', themeName);

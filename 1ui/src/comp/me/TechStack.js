@@ -1,6 +1,6 @@
 import React from 'react';
 import * as echarts from 'echarts';
-import json from '../data/techstack.json';
+import json from '../../data/techstack.json';
 
 export default class TechStack extends React.Component {
 
