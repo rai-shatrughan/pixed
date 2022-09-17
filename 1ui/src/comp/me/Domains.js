@@ -1,24 +1,18 @@
-import React from 'react';
+import { useEffect } from 'react';
 import * as echarts from 'echarts';
 import json from '../../data/domains.json';
 
-export default class Domains extends React.Component {
+export default function Domains(props) {
 
-    componentDidMount() {
-        drawDomains(this.props.theme);
-    }
+    useEffect(() => {
+        drawDomains(props.theme);
+    });
 
-    componentDidUpdate() {
-        drawDomains(this.props.theme);
-    }
-
-    render() {
-        return (
-            <div className="pure-g g4 domains">
-                <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecDomains"></div>
-            </div>
-        );
-    }
+    return (
+        <div className="pure-g g4 domains">
+            <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecDomains"></div>
+        </div>
+    );
 }
 
 function drawDomains(theme) {
