@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style/index.css";
 import "purecss/build/base-min.css";
@@ -11,23 +11,16 @@ import {
     CompMap 
 } from "./comp/CompList";
 
-class Index extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            show: "Home",
-            theme: getTheme(),
-        };
-    }
+function Index() {
+    const [show, setShow] = useState("Home");
+    const [theme, setTheme] = useState(getTheme());
+    const VisibleComponent = CompMap[show];
 
-    headerClicked = (menu, e) => {
+    function headerClicked(menu, e){
         e.preventDefault();
-        this.setState({ show: menu });
+        setShow(menu);
     };
-
-    render() {
-        const VisibleComponent = CompMap[this.state.show];
-
+        
         return (
             <div>
                 <div className="pure-menu pure-menu-horizontal">
@@ -35,23 +28,22 @@ class Index extends React.Component {
                         <Header
                             menu={menu}
                             key={menu}
-                            onClicked={(e) => this.headerClicked(menu, e)}
+                            onClicked={(e) => headerClicked(menu, e)}
                         />
                     ))}
 
                     <Theme
-                        theme={this.state.theme}
+                        theme={theme}
                         onClicked={() => 
-                            this.setState({ theme: getTheme() })
+                            setTheme(getTheme())
                         }
                     />
                 </div>
 
-                <VisibleComponent theme={this.state.theme} />
+                <VisibleComponent theme={theme} />
             </div>
         );
     }
-}
 
 const container = document.getElementById("root");
 const root = createRoot(container);

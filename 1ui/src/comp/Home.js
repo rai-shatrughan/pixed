@@ -1,25 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as echarts from 'echarts';
 
-export default class Home extends React.Component {
+export default function Home(props) {
 
-  componentDidMount() {
-    drawHome(this.props.theme);
-  }
+  useEffect(() => {
+    drawHome(props.theme);
+  });
 
-  componentDidUpdate() {
-    drawHome(this.props.theme);
-  }
-
-  render() {
-    return (
-      <div className="pure-g g1 home">
-        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeBar"></div>
-        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeName"></div>
-        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeTag"></div>
-      </div>
-    );
-  }
+  return (
+    <div className="pure-g g1 home">
+      <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeBar"></div>
+      <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeName"></div>
+      <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeTag"></div>
+    </div>
+  );
 }
 
 function drawHome(theme) {
