@@ -10,6 +10,10 @@ export { default as VR } from "./3d/VR";
 
 export { default as Video } from "./strm/Video";
 
-//util
+//com
+export { default as Login } from "./com/Login";
+
+// ***Constants MUST be last since it uses Above Components
 export { default as Theme, getTheme } from "./util/Theme";
 export { Menus, CompMap } from "./util/Constants";
+// ***Constants MUST be last since it uses Above Components
