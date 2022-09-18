@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style/index.css";
-import "purecss/build/base-min.css";
 import "purecss/build/grids-responsive-min.css";
+import "bulma/css/bulma.css"
 import { 
     Header, 
     Theme, 

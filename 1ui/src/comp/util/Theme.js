@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import logoDark from '../../assets/theme-dark.gif';
-import logoLight from '../../assets/theme-light.gif';
+import { SunIcon, MoonIcon } from "@primer/octicons-react";
 
 export function setTheme(themeName) {
     localStorage.setItem('theme', themeName);
@@ -34,8 +33,8 @@ export default function Theme(props) {
             }}>
 
             {props.theme === 'dark' ?
-                <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoDark} /> :
-                <img className="theme-icon" title="ToggleTheme" alt="ToggleTheme" src={logoLight} />
+                <SunIcon size={16} fill="#f00" /> :
+                <MoonIcon size={16} fill="#f00" />
             }
         </button>
     );
