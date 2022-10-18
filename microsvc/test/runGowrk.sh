@@ -16,19 +16,19 @@ go-wrk -c 8000 -d 30 -T 30000 -M PUT \
 end=`date`
 echo "End Time - " $end
 
-# echo ""
-# echo "***get TS***"
-# echo ""
+echo ""
+echo "***get TS***"
+echo ""
 
-# start=`date`
-# echo "Start Time - " $start
+start=`date`
+echo "Start Time - " $start
 
-#     go-wrk -c 500 -d 30 -T 50000 -M GET \
-#     -H "X-API-Key: sr12345" \
-#     http://172.18.0.21:8002/api/v1/timeseries/6fdae6af-226d-48bd-8b61-699758137eb3?duration=1m
+    go-wrk -c 500 -d 30 -T 50000 -M GET \
+    -H "X-API-Key: sr12345" \
+    http://172.18.0.21:8002/api/v1/timeseries/6fdae6af-226d-48bd-8b61-699758137eb3?duration=1m
 
-# end=`date`
-# echo "End Time - " $end
+end=`date`
+echo "End Time - " $end
 
 # curl -H "X-API-Key: sr12345" \
 # http://172.18.0.21:8002/api/v1/timeseries/6fdae6af-226d-48bd-8b61-699758137eb3?duration=1m

@@ -20,6 +20,8 @@ var (
 	groupID = "ts-consumer-group"
 	kf      = mw.KafkaWriter{}
 	brokers []string
+
+	etc = mw.KV{}
 )
 
 func init() {
@@ -32,6 +34,7 @@ func init() {
 	kf.Brokers = brokers
 
 	kf.New()
+	etc.New()
 }
 
 func main() {
@@ -40,8 +43,12 @@ func main() {
 
 	router := mux.NewRouter()
 	router.
-		HandleFunc("/api/v1/timeseries/{id}", TSHandler).
-		Methods("GET", "POST", "PUT")
+		HandleFunc("/api/v1/timeseries/{id}", TSPutHandler).
+		Methods("PUT")
+
+	router.
+		HandleFunc("/api/v1/timeseries/{id}", TSGetHandler).
+		Methods("GET")
 
 	srv := &http.Server{
 		Handler: router,
@@ -54,7 +61,19 @@ func main() {
 	log.Fatal(srv.ListenAndServe())
 }
 
-func TSHandler(w http.ResponseWriter, r *http.Request) {
+func TSGetHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+
+	resp := etc.GetFromKeyWithLimit("/"+id, 1000)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.Write([]byte(resp))
+
+}
+
+func TSPutHandler(w http.ResponseWriter, r *http.Request) {
 	var tsa md.TimeseriesArray
 
 	err := json.NewDecoder(r.Body).Decode(&tsa)

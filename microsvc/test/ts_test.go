@@ -10,13 +10,12 @@ import (
 
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-openapi/strfmt"
-	"github.com/google/uuid"
 
 	model "microsvc/pkg/model"
 )
 
 var (
-	tsBaseURL  = "http://localhost:8002/api/v1/timeseries"
+	tsBaseURL  = "http://172.18.0.21:8002/api/v1/timeseries"
 	baseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
 )
 
@@ -32,7 +31,7 @@ func TestPutTimeSeries(t *testing.T) {
 		JSON().
 		Object()
 
-	obj.Value("TimeseriesUpload").Equal("ok")
+	obj.Value("TimeseriesUpload").Equal("OK")
 
 }
 
@@ -54,9 +53,10 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 	e := httpexpect.New(b, tsBaseURL)
 
 	for n := 0; n < b.N; n++ {
-		myid := uuid.New()
+		// myid := uuid.New()
+		myid := baseEntity
 		tsa := getTS()
-		obj := e.PUT(myid.String()).
+		obj := e.PUT(myid).
 			WithHeader("X-API-Key", "sr12345").
 			WithHeader("Content-Type", "application/json").
 			WithJSON(tsa).
@@ -65,7 +65,7 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 			JSON().
 			Object()
 
-		obj.Value("TimeseriesUpload").Equal("ok")
+		obj.Value("TimeseriesUpload").Equal("OK")
 	}
 }
 
