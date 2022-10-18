@@ -10,19 +10,14 @@ import (
 
 	"github.com/gavv/httpexpect/v2"
 	"github.com/google/uuid"
+
+	model "mware/model"
 )
 
 var (
-	tsBaseURL  = "http://172.18.0.21:8002/api/v1/timeseries"
+	tsBaseURL  = "http://localhost:8002/api/v1/timeseries"
 	baseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
 )
-
-type TimeSeries struct {
-	Timestamp string `json:"timestamp"`
-	Property  string `json:"property"`
-	Unit      string `json:"unit"`
-	Value     int    `json:"value"`
-}
 
 func TestPutTimeSeries(t *testing.T) {
 	tsa := getTS()
@@ -73,24 +68,23 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 	}
 }
 
-func getTS() []TimeSeries {
-	loc, _ := time.LoadLocation("UTC")
+func getTS() []model.Timeseries {
 
-	ts1 := TimeSeries{
-		Timestamp: time.Now().In(loc).Format("2006-01-02T15:04:05.012Z"),
+	ts1 := model.Timeseries{
+		Timestamp: time.Now(),
 		Property:  "temperature",
 		Unit:      "celcius",
 		Value:     10,
 	}
 
-	ts2 := TimeSeries{
-		Timestamp: time.Now().In(loc).Format("2006-01-02T15:04:05.012Z"),
+	ts2 := model.Timeseries{
+		Timestamp: time.Now(),
 		Property:  "pressure",
 		Unit:      "psi",
 		Value:     20,
 	}
 
-	tsa := []TimeSeries{
+	tsa := []model.Timeseries{
 		ts1,
 		ts2,
 	}

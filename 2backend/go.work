@@ -2,9 +2,7 @@ go 1.18
 
 use (
 	./mware
-    ./impl
     ./test
-	./svc/ts
     ./svc/gateway
     ./svc/strm
 )

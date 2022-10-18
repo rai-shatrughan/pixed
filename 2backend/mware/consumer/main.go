@@ -14,8 +14,8 @@ import (
 	"go.uber.org/zap"
 
 	// websvc modules
-	mw "mware"
-	"svc/ts/models"
+	md "mware/model"
+	mw "mware/pkg"
 )
 
 var (
@@ -118,7 +118,7 @@ func parseKafkaMsg(msgChan <-chan kafka.Message, tskvChan chan<- tskv) {
 		default:
 			start := time.Now()
 			msg := <-msgChan
-			tsa := models.TimeseriesArray{}
+			tsa := md.TimeseriesArray{}
 			json.Unmarshal(msg.Value, &tsa)
 			for i := range tsa {
 				date := strings.Split(tsa[i].Timestamp.String(), "T")
