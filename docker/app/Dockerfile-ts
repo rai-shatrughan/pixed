@@ -1,4 +1,4 @@
 #FROM debian:bullseye-slim
 FROM scratch
-COPY 0docker/app/conf/config.yaml /conf/config.yaml
-COPY 0docker/app/bin/ts-server /usr/bin/ts-server
+COPY docker/app/conf/config.yaml /conf/config.yaml
+COPY docker/app/bin/ts-server /usr/bin/ts-server

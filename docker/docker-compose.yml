@@ -87,7 +87,7 @@ services:
   ts:
     build:
       context: ../
-      dockerfile: ./0docker/app/Dockerfile-ts
+      dockerfile: ./docker/app/Dockerfile-ts
     container_name: ts
     image: ts:v1
     restart: always
@@ -105,7 +105,7 @@ services:
   cons:
     build:
       context: ../
-      dockerfile: ./0docker/app/Dockerfile-cons
+      dockerfile: ./docker/app/Dockerfile-cons
     container_name: cons
     image: cons:v1
     entrypoint: ["/usr/bin/consumer"]
@@ -121,7 +121,7 @@ services:
   strm:
     build:
       context: ../
-      dockerfile: ./0docker/app/Dockerfile-strm
+      dockerfile: ./docker/app/Dockerfile-strm
     container_name: strm
     image: strm:v1
     restart: always

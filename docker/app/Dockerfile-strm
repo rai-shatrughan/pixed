@@ -1,2 +1,2 @@
 FROM scratch
-COPY 0docker/app/bin/strm /usr/bin/strm
+COPY docker/app/bin/strm /usr/bin/strm

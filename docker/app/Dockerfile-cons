@@ -1,4 +1,4 @@
 #FROM debian:bullseye-slim
 FROM scratch
-COPY 0docker/app/conf/config.yaml /conf/config.yaml
-COPY 0docker/app/bin/consumer /usr/bin/consumer
+COPY docker/app/conf/config.yaml /conf/config.yaml
+COPY docker/app/bin/consumer /usr/bin/consumer

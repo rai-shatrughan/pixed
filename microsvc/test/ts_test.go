@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/google/uuid"
 
-	model "mware/model"
+	model "microsvc/pkg/model"
 )
 
 var (
@@ -71,7 +71,7 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 
 func getTS() []model.Timeseries {
 
-	dateTime, _ := strfmt.ParseDateTime(time.Now().String())
+	dateTime := strfmt.DateTime(time.Now().UTC())
 
 	ts1 := model.Timeseries{
 		Timestamp: &dateTime,
