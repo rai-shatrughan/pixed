@@ -7,11 +7,11 @@ import (
 
 	"github.com/gorilla/mux"
 
-	md "mware/model"
+	md "microsvc/pkg/model"
 )
 
 func main() {
-	const port = "8002"
+	const port = "8001"
 	const host = "0.0.0.0"
 
 	router := mux.NewRouter()

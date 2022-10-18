@@ -14,8 +14,8 @@ import (
 	"go.uber.org/zap"
 
 	// websvc modules
-	md "mware/model"
-	mw "mware/pkg"
+	md "microsvc/pkg/model"
+	mw "microsvc/pkg/mware"
 )
 
 var (

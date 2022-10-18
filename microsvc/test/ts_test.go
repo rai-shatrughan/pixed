@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gavv/httpexpect/v2"
+	"github.com/go-openapi/strfmt"
 	"github.com/google/uuid"
 
 	model "mware/model"
@@ -70,15 +71,17 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 
 func getTS() []model.Timeseries {
 
+	dateTime, _ := strfmt.ParseDateTime(time.Now().String())
+
 	ts1 := model.Timeseries{
-		Timestamp: time.Now(),
+		Timestamp: &dateTime,
 		Property:  "temperature",
 		Unit:      "celcius",
 		Value:     10,
 	}
 
 	ts2 := model.Timeseries{
-		Timestamp: time.Now(),
+		Timestamp: &dateTime,
 		Property:  "pressure",
 		Unit:      "psi",
 		Value:     20,

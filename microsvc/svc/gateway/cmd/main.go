@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
+	"microsvc/svc/gateway/handler"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"gateway/handler"
 )
 
 var pMap = make(map[string]string)
