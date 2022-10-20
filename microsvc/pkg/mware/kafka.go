@@ -37,13 +37,13 @@ type kafkaBase struct {
 	StartOffset *int64
 }
 
-//KafkaReaders wraps kafka.Reader
+// KafkaReaders wraps kafka.Reader
 type KafkaReaders struct {
 	Readers []*kafka.Reader
 	kafkaBase
 }
 
-//KafkaWriter wraps kafka.Writer
+// KafkaWriter wraps kafka.Writer
 type KafkaWriter struct {
 	writer *kafka.Writer
 	kafkaBase
@@ -78,7 +78,7 @@ func (kf *kafkaBase) fillDefaults() {
 
 }
 
-//New initializes new instance of readers
+// New initializes new instance of readers
 func (kf *KafkaReaders) New(readerCount int) {
 	kf.fillDefaults()
 	for i := 0; i < readerCount; i++ {
@@ -95,7 +95,7 @@ func (kf *KafkaReaders) New(readerCount int) {
 	}
 }
 
-//New initializes new instance of writer
+// New initializes new instance of writer
 func (kf *KafkaWriter) New() {
 	kf.fillDefaults()
 	if kf.writer == nil {
@@ -109,7 +109,7 @@ func (kf *KafkaWriter) New() {
 	kf.setupCloseWriterHandler()
 }
 
-//Read returns kafka Message
+// Read returns kafka Message
 func (kf *KafkaReaders) Read(reader *kafka.Reader) kafka.Message {
 
 	logger.Info("Reading message from group",
@@ -133,8 +133,8 @@ func (kf *KafkaReaders) Read(reader *kafka.Reader) kafka.Message {
 
 }
 
-//Write pushes data to kafka
-func (kf *KafkaWriter) Write(key, value []byte) {
+// Write pushes data to kafka
+func (kf *KafkaWriter) Write(key, value []byte) error {
 	start := time.Now()
 	logger.Info("Kafka Write", zap.String("start", start.String()))
 	err := kf.writer.WriteMessages(context.Background(),
@@ -147,12 +147,14 @@ func (kf *KafkaWriter) Write(key, value []byte) {
 	logger.Info("Kafka Write", zap.Duration("duration", elapsed))
 
 	if err != nil {
-		logger.Error("Error Writing msg to Kafka ", zap.Error(err))
+		return err
+	} else {
+		return nil
 	}
 
 }
 
-//BatchWrite puts data into batches
+// BatchWrite puts data into batches
 func (kf *KafkaWriter) BatchWrite(key, val [][]byte) {
 
 	msgs := make([]kafka.Message, len(key))

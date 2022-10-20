@@ -65,7 +65,7 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 			JSON().
 			Object()
 
-		obj.Value("TimeseriesUpload").Equal("OK")
+		obj.Value("TimeseriesUpload").Equal("Ok")
 	}
 }
 

@@ -12,3 +12,7 @@ type Timeseries struct {
 }
 
 type TimeseriesArray []Timeseries
+
+type TimeseriesUploadStatus struct {
+	TimeseriesUpload string `json:"TimeseriesUpload"`
+}

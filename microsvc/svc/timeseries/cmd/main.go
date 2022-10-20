@@ -1,119 +1,59 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"log"
+	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
+	"syscall"
 
-	"github.com/gorilla/mux"
+	"microsvc/svc/timeseries"
 
-	md "microsvc/pkg/model"
-	mw "microsvc/pkg/mware"
+	"github.com/go-kit/kit/log"
 )
-
-var (
-	topic   = "ts"
-	groupID = "ts-consumer-group"
-	kf      = mw.KafkaWriter{}
-	brokers []string
-
-	etc = mw.KV{}
-)
-
-func init() {
-	conf := mw.Config{}
-	conf.New()
-
-	brokers = conf.GetStringSlice("kafka.brokers")
-	kf.GroupID = &groupID
-	kf.Topic = &topic
-	kf.Brokers = brokers
-
-	kf.New()
-	etc.New()
-}
 
 func main() {
 	const port = "8002"
 	const host = "0.0.0.0"
+	var httpAddr = flag.String("http.addr", host+":"+port, "HTTP listen address")
 
-	router := mux.NewRouter()
-	router.
-		HandleFunc("/api/v1/timeseries/{id}", TSPutHandler).
-		Methods("PUT")
+	var logger log.Logger
+	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	httpLogger := log.With(logger, "component", "http")
 
-	router.
-		HandleFunc("/api/v1/timeseries/{id}", TSGetHandler).
-		Methods("GET")
+	ts := timeseries.NewService()
 
-	srv := &http.Server{
-		Handler: router,
-		Addr:    host + ":" + port,
-	}
+	mux := http.NewServeMux()
+	mux.Handle("/api/v1/timeseries/", timeseries.MakeHandler(ts, httpLogger))
 
-	shutDownServer(srv)
+	http.Handle("/", accessControl(mux))
 
-	log.Printf("Starting server on %s:%v\n", host, port)
-	log.Fatal(srv.ListenAndServe())
-}
-
-func TSGetHandler(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id := params["id"]
-
-	resp := etc.GetFromKeyWithLimit("/"+id, 1000)
-
-	w.Header().Set("Content-Type", "application/json")
-
-	w.Write([]byte(resp))
-
-}
-
-func TSPutHandler(w http.ResponseWriter, r *http.Request) {
-	var tsa md.TimeseriesArray
-
-	err := json.NewDecoder(r.Body).Decode(&tsa)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	kfmsg, _ := json.Marshal(tsa)
-
-	params := mux.Vars(r)
-	id := params["id"]
-	kf.Write([]byte(id), []byte(kfmsg))
-
-	w.Header().Set("Content-Type", "application/json")
-	resp := "{\"TimeseriesUpload\":\"OK\"}"
-
-	w.Write([]byte(resp))
-
-}
-
-func shutDownServer(server *http.Server) {
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	// This goroutine is running in parallels to the main one
+	errs := make(chan error, 2)
 	go func() {
-		// creating a channel to listen for signals, like SIGINT
-		stop := make(chan os.Signal, 1)
-		// subscribing to interruption signals
-		signal.Notify(stop, os.Interrupt)
-		// this blocks until the signal is received
-		<-stop
-		// initiating the shutdown
-		err := server.Shutdown(context.Background())
-		// can't do much here except for logging any errors
-		if err != nil {
-			log.Printf("error during shutdown: %v\n", err)
-		}
-		// notifying the main goroutine that we are done
-		wg.Done()
+		logger.Log("transport", "http", "address", *httpAddr, "msg", "listening")
+		errs <- http.ListenAndServe(*httpAddr, nil)
+	}()
+	go func() {
+		c := make(chan os.Signal)
+		signal.Notify(c, syscall.SIGINT)
+		errs <- fmt.Errorf("%s", <-c)
 	}()
 
+	logger.Log("terminated", <-errs)
+}
+
+func accessControl(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }

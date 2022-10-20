@@ -5,9 +5,9 @@ go 1.19
 require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/gavv/httpexpect/v2 v2.3.1
+	github.com/go-kit/kit v0.9.0
 	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/luraproject/lura v1.4.1
 	github.com/segmentio/kafka-go v0.4.35
@@ -27,6 +27,7 @@ require (
 	github.com/fatih/structs v1.0.0 // indirect
 	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7 // indirect
 	github.com/gin-gonic/gin v1.1.5-0.20170702092826-d459835d2b07 // indirect
+	github.com/go-logfmt/logfmt v0.5.0 // indirect
 	github.com/go-openapi/errors v0.20.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
