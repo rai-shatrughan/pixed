@@ -20,14 +20,6 @@ var (
 	logger          = Logger{}
 )
 
-func init() {
-	conf := Config{}
-	conf.New()
-	brokers = conf.GetStringSlice("kafka.brokers")
-
-	logger.New()
-}
-
 type kafkaBase struct {
 	Brokers     []string
 	Topic       *string
@@ -35,6 +27,7 @@ type kafkaBase struct {
 	MinBytes    *int
 	MaxBytes    *int
 	StartOffset *int64
+	Conf        Config
 }
 
 // KafkaReaders wraps kafka.Reader
@@ -50,6 +43,10 @@ type KafkaWriter struct {
 }
 
 func (kf *kafkaBase) fillDefaults() {
+	logger.New()
+	kf.Conf.New()
+	brokers = kf.Conf.GetStringSlice("kafka.brokers")
+
 	if len(kf.Brokers) == 0 {
 		kf.Brokers = make([]string, len(brokers))
 	}

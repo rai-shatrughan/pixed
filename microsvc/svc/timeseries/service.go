@@ -38,18 +38,11 @@ func NewService() *service {
 		topic   = "ts"
 		groupID = "ts-consumer-group"
 		kf      = mw.KafkaWriter{}
-		brokers []string
-
-		etc = mw.KV{}
+		etc     = mw.KV{}
 	)
 
-	conf := mw.Config{}
-	conf.New()
-
-	brokers = conf.GetStringSlice("kafka.brokers")
 	kf.GroupID = &groupID
 	kf.Topic = &topic
-	kf.Brokers = brokers
 
 	kf.New()
 	etc.New()

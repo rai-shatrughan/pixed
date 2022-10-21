@@ -16,22 +16,19 @@ var (
 	endpoints   []string
 )
 
-func init() {
-	conf := Config{}
-	conf.New()
-	endpoints = conf.GetStringSlice("etcd.hosts")
-
-	logger.New()
-}
-
-//KV is wrapper for KV Database
+// KV is wrapper for KV Database
 type KV struct {
-	cli *clientv3.Client
-	err error
+	cli  *clientv3.Client
+	conf Config
+	err  error
 }
 
-//New returns singleton instance of KV
+// New returns singleton instance of KV
 func (kv *KV) New() {
+	kv.conf.New()
+	endpoints = kv.conf.GetStringSlice("etcd.hosts")
+	logger.New()
+
 	// clientv3.SetLogger(grpclog.NewLoggerV2(os.Stderr, os.Stderr, os.Stderr))
 	kv.cli, kv.err = clientv3.New(clientv3.Config{
 		Endpoints:   endpoints,
@@ -42,7 +39,7 @@ func (kv *KV) New() {
 	}
 }
 
-//Put upserts data into KV store
+// Put upserts data into KV store
 func (kv *KV) Put(key, value string) {
 	start := time.Now()
 	_, kv.err = kv.cli.Put(context.TODO(), key, value)
@@ -56,7 +53,7 @@ func (kv *KV) Put(key, value string) {
 
 }
 
-//Get fetches data from KV store
+// Get fetches data from KV store
 func (kv *KV) Get(key string) string {
 	start := time.Now()
 	getResp, err := kv.cli.Get(context.TODO(), key)
@@ -74,7 +71,7 @@ func (kv *KV) Get(key string) string {
 
 }
 
-//GetFromKey fetches data after a time range
+// GetFromKey fetches data after a time range
 func (kv *KV) GetFromKey(key string) string {
 	start := time.Now()
 	getResp, err := kv.cli.Get(context.TODO(), key, clientv3.WithFromKey(), clientv3.WithLimit(0))
@@ -102,7 +99,7 @@ func (kv *KV) GetFromKey(key string) string {
 
 }
 
-//GetFromKeyWithLimit fetches data after a time range with limit
+// GetFromKeyWithLimit fetches data after a time range with limit
 func (kv *KV) GetFromKeyWithLimit(key string, limit int64) string {
 	start := time.Now()
 	getResp, err := kv.cli.Get(context.TODO(), key, clientv3.WithFromKey(), clientv3.WithLimit(limit))
