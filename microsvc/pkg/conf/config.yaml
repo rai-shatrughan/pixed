@@ -4,3 +4,13 @@ kafka:
 etcd:
   hosts:
     - "172.18.0.71:2379"
+    
+http:
+  address: "0.0.0.0:8002"
+basepath:
+  timeseries: "/api/v1/timeseries/"
+  stream: "/api/v1/stream/"
+
+svc:
+  stream:
+    dir: "/data/asset"

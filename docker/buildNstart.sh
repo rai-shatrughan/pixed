@@ -44,12 +44,9 @@ crate_dir(){
 
     cp -r pkg/conf ../docker/app
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../docker/app/bin/consumer pkg/consumer/main.go
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../docker/app/bin/ts-server svc/timeseries/cmd/main.go
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../docker/app/bin/strm svc/strm/cmd/main.go
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../docker/app/bin/ts-server svc/main.go
     # go build -ldflags "-linkmode external -extldflags -static" -o ../docker/app/bin/consumer pkg/consumer/main.go
-    # go build -ldflags "-linkmode external -extldflags -static" -o ../docker/app/bin/ts-server svc/timeseries/cmd/main.go
-    #go build -o ../docker/app/bin/consumer pkg/consumer/main.go
-    #go build -o ../docker/app/bin/ts-server svc/timeseries/cmd/main.go 
+    # go build -ldflags "-linkmode external -extldflags -static" -o ../docker/app/bin/ts-server svc/main.go
     cd ../docker
 }
 

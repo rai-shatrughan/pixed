@@ -2,7 +2,6 @@ package timeseries
 
 import (
 	"encoding/json"
-	"fmt"
 	model "microsvc/pkg/model"
 
 	mw "microsvc/pkg/mware"
@@ -54,9 +53,6 @@ func NewService() *service {
 
 	kf.New()
 	etc.New()
-
-	fmt.Println("kf", kf)
-	fmt.Println("kv", etc)
 
 	return &service{
 		kf:      kf,

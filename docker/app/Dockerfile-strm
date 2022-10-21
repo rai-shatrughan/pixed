@@ -1,2 +1,0 @@
-FROM scratch
-COPY docker/app/bin/strm /usr/bin/strm

@@ -1,39 +1,56 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"microsvc/pkg/mware"
+	"microsvc/svc/stream"
 	"microsvc/svc/timeseries"
 
 	"github.com/go-kit/kit/log"
 )
 
-func main() {
-	const port = "8002"
-	const host = "0.0.0.0"
-	var httpAddr = flag.String("http.addr", host+":"+port, "HTTP listen address")
+var (
+	conf       = mware.Config{}
+	logger     log.Logger
+	httpAddr   string
+	mux        *http.ServeMux
+	httpLogger log.Logger
+)
 
-	var logger log.Logger
+func init() {
+	conf.New()
+	httpAddr = conf.GetString("http.address")
+	mux = http.NewServeMux()
+
 	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
-	httpLogger := log.With(logger, "component", "http")
+	httpLogger = log.With(logger, "component", "http")
+}
+
+func main() {
 
 	ts := timeseries.NewService()
 
-	mux := http.NewServeMux()
-	mux.Handle("/api/v1/timeseries/", timeseries.MakeHandler(ts, httpLogger))
+	mux.Handle(conf.GetString("basepath.timeseries"), timeseries.MakeHandler(ts, httpLogger))
+
+	mux.Handle(conf.GetString("basepath.stream"), stream.StreamHandler(conf))
 
 	http.Handle("/", accessControl(mux))
 
+	startServer()
+
+}
+
+func startServer() {
 	errs := make(chan error, 2)
 	go func() {
-		logger.Log("transport", "http", "address", *httpAddr, "msg", "listening")
-		errs <- http.ListenAndServe(*httpAddr, nil)
+		logger.Log("transport", "http", "address", httpAddr, "msg", "listening")
+		errs <- http.ListenAndServe(httpAddr, nil)
 	}()
 	go func() {
 		c := make(chan os.Signal)
