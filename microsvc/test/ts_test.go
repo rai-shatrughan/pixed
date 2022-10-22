@@ -31,7 +31,7 @@ func TestPutTimeSeries(t *testing.T) {
 		JSON().
 		Object()
 
-	obj.Value("TimeseriesUpload").Equal("OK")
+	obj.Value("TimeseriesUpload").Equal("Ok")
 
 }
 
@@ -45,7 +45,7 @@ func TestGetTimeSeries(t *testing.T) {
 		JSON().
 		Array()
 
-	obj.First().Object().Value("property")
+	obj.First().Object().Value("values")
 }
 
 func BenchmarkPostTimeSeries(b *testing.B) {
@@ -73,18 +73,26 @@ func getTS() []model.Timeseries {
 
 	dateTime := strfmt.DateTime(time.Now().UTC())
 
+	val1 := model.TimeseriesValue{
+		DataPointId: "dp1",
+		Value:       "12",
+		QualityCode: "0",
+	}
+
+	val2 := model.TimeseriesValue{
+		DataPointId: "dp2",
+		Value:       "15",
+		QualityCode: "1",
+	}
+
 	ts1 := model.Timeseries{
 		Timestamp: &dateTime,
-		Property:  "temperature",
-		Unit:      "celcius",
-		Value:     10,
+		Values:    []model.TimeseriesValue{val1, val2},
 	}
 
 	ts2 := model.Timeseries{
 		Timestamp: &dateTime,
-		Property:  "pressure",
-		Unit:      "psi",
-		Value:     20,
+		Values:    []model.TimeseriesValue{val1, val2},
 	}
 
 	tsa := []model.Timeseries{
