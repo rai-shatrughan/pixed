@@ -16,6 +16,7 @@ import (
 
 var (
 	conf       = mware.Config{}
+	mwLogger   = mware.Logger{}
 	logger     log.Logger
 	httpAddr   string
 	mux        *http.ServeMux
@@ -24,6 +25,8 @@ var (
 
 func init() {
 	conf.New()
+	mwLogger.New()
+
 	httpAddr = conf.GetString("http.address")
 	mux = http.NewServeMux()
 
@@ -34,7 +37,7 @@ func init() {
 
 func main() {
 
-	ts := timeseries.NewService()
+	ts := timeseries.NewService(&conf, &mwLogger)
 
 	mux.Handle(conf.GetString("basepath.timeseries"), timeseries.MakeHandler(ts, httpLogger))
 

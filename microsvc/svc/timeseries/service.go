@@ -33,19 +33,12 @@ func (s *service) GetTimeseries(assetId string) string {
 	return resp
 }
 
-func NewService() *service {
-	var (
-		topic   = "ts"
-		groupID = "ts-consumer-group"
-		kf      = mw.KafkaWriter{}
-		etc     = mw.KV{}
-	)
+func NewService(conf *mw.Config, logger *mw.Logger) *service {
+	kf := mw.KafkaWriter{}
+	etc := mw.KV{}
 
-	kf.GroupID = &groupID
-	kf.Topic = &topic
-
-	kf.New()
-	etc.New()
+	kf.New(conf, logger)
+	etc.New(conf, logger)
 
 	return &service{
 		kf:      kf,

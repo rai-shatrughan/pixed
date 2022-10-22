@@ -19,8 +19,6 @@ import (
 )
 
 var (
-	topic            = "ts"
-	groupID          = "ts-consumer-group"
 	chanBufferSize   = 10000
 	kafkaReaderCount = 5
 	tsParserCount    = 10
@@ -30,7 +28,6 @@ var (
 	kvCounterChan    = make(chan int8, chanBufferSize*3)
 	etc              = mw.KV{}
 	kf               = mw.KafkaReaders{}
-	brokers          []string
 	logger           = mw.Logger{}
 	ctx, cancel      = context.WithCancel(context.Background())
 )
@@ -45,14 +42,8 @@ func init() {
 	conf.New()
 
 	logger.New()
-
-	brokers = conf.GetStringSlice("kafka.brokers")
-	kf.GroupID = &groupID
-	kf.Topic = &topic
-	kf.Brokers = brokers
-	kf.New(kafkaReaderCount)
-
-	etc.New()
+	etc.New(&conf, &logger)
+	kf.New(kafkaReaderCount, &conf, &logger)
 }
 
 func main() {

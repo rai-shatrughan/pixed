@@ -5,10 +5,14 @@ import (
 )
 
 type Timeseries struct {
-	Timestamp *strfmt.DateTime `json:"timestamp"`
-	Property  string           `json:"property"`
-	Unit      string           `json:"unit"`
-	Value     float64          `json:"value"`
+	Timestamp *strfmt.DateTime  `json:"timestamp"`
+	Values    []TimeseriesValue `json:"values"`
+}
+
+type TimeseriesValue struct {
+	DataPointId string      `json:"dataPointId"`
+	Value       interface{} `json:"value"`
+	QualityCode interface{} `json:"qualityCode"`
 }
 
 type TimeseriesArray []Timeseries
