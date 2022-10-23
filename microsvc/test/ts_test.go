@@ -75,14 +75,14 @@ func getTS() []model.Timeseries {
 
 	val1 := model.TimeseriesValue{
 		DataPointId: "dp1",
-		Value:       "12",
-		QualityCode: "0",
+		Value:       12,
+		QualityCode: 0,
 	}
 
 	val2 := model.TimeseriesValue{
 		DataPointId: "dp2",
-		Value:       "15",
-		QualityCode: "1",
+		Value:       15,
+		QualityCode: 1,
 	}
 
 	ts1 := model.Timeseries{
