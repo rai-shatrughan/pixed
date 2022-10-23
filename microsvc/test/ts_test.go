@@ -15,14 +15,14 @@ import (
 )
 
 var (
-	tsBaseURL  = "http://172.18.0.21:8000/api/v1/timeseries"
+	tsBaseURL  = "http://172.18.0.21:8000/api/v1/exchange"
 	baseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
 )
 
-func TestPutTimeSeries(t *testing.T) {
+func TestPostTimeSeries(t *testing.T) {
 	tsa := getTS()
 	e := httpexpect.New(t, tsBaseURL)
-	obj := e.PUT(baseEntity).
+	obj := e.POST(baseEntity).
 		WithHeader("X-API-Key", "sr12345").
 		WithHeader("Content-Type", "application/json").
 		WithJSON(tsa).

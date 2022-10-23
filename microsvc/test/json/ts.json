@@ -4,13 +4,13 @@
         "values": [
             {
                 "dataPointId": "dp1",
-                "value": "985",
-                "qualityCode": "0"
+                "value": 985,
+                "qualityCode": 0
             },
             {
                 "dataPointId": "dp2",
-                "value": "374",
-                "qualityCode": "0"
+                "value": 374,
+                "qualityCode": 0
             }
         ]
     },
@@ -19,13 +19,13 @@
         "values": [
             {
                 "dataPointId": "dp1",
-                "value": "987",
-                "qualityCode": "0"
+                "value": 987,
+                "qualityCode": 0
             },
             {
                 "dataPointId": "dp2",
-                "value": "376",
-                "qualityCode": "0"
+                "value": 376,
+                "qualityCode": 0
             }
         ]
     }
