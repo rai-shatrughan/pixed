@@ -7,16 +7,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"microsvc/pkg/mware"
-	"microsvc/svc/stream"
-	"microsvc/svc/timeseries"
+	"microsvc/domain/stream"
+	"microsvc/domain/timeseries"
+	"microsvc/pkg/util"
 
 	"github.com/go-kit/kit/log"
 )
 
 var (
-	conf       = mware.Config{}
-	mwLogger   = mware.Logger{}
+	conf       = util.Config{}
+	mwLogger   = util.Logger{}
 	logger     log.Logger
 	httpAddr   string
 	mux        *http.ServeMux
@@ -31,7 +31,7 @@ func init() {
 	mux = http.NewServeMux()
 
 	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "ws", log.DefaultTimestampUTC)
 	httpLogger = log.With(logger, "component", "http")
 }
 

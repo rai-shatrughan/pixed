@@ -1,4 +1,4 @@
-package mware
+package util
 
 import (
 	"database/sql"

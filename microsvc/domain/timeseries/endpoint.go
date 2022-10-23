@@ -20,15 +20,23 @@ type getTimeseriesRequest struct {
 func makePutTimeseriesEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(putTimeseriesRequest)
-		resp := s.PutTimeseries(req.assetId, req.tsa)
-		return resp, nil
+		resp, err := s.PutTimeseries(req.assetId, req.tsa)
+		if err != nil {
+			return resp, err
+		} else {
+			return resp, nil
+		}
 	}
 }
 
 func makeGetTimeseriesEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(getTimeseriesRequest)
-		resp := s.GetTimeseries(req.assetId)
-		return resp, nil
+		resp, err := s.GetTimeseries(req.assetId)
+		if err != nil {
+			return resp, err
+		} else {
+			return resp, nil
+		}
 	}
 }

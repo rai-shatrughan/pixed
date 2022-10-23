@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	tsBaseURL  = "http://172.18.0.21:8002/api/v1/timeseries"
+	tsBaseURL  = "http://172.18.0.21:8000/api/v1/timeseries"
 	baseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
 )
 

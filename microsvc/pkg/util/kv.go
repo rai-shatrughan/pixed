@@ -1,4 +1,4 @@
-package mware
+package util
 
 import (
 	"context"
@@ -16,11 +16,11 @@ type KV struct {
 	cli    *clientv3.Client
 	conf   *Config
 	logger *Logger
-	err    error
 }
 
 // New returns instance of KV Store
 func (kv *KV) New(conf *Config, logger *Logger) {
+	var err error
 	kv.conf = conf
 	kv.logger = logger
 
@@ -28,53 +28,57 @@ func (kv *KV) New(conf *Config, logger *Logger) {
 	dialTimeout := 5 * time.Second
 
 	// clientv3.SetLogger(grpclog.NewLoggerV2(os.Stderr, os.Stderr, os.Stderr))
-	kv.cli, kv.err = clientv3.New(clientv3.Config{
+	kv.cli, err = clientv3.New(clientv3.Config{
 		Endpoints:   endpoints,
 		DialTimeout: dialTimeout,
 	})
-	if kv.err != nil {
-		kv.logger.Error("Error while connecting KV store ", zap.Error(kv.err))
+	if err != nil {
+		kv.logger.Error("Error while connecting KV store ", zap.Error(err))
 	}
 }
 
 // Put upserts data into KV store
-func (kv *KV) Put(key, value string) {
+func (kv *KV) Put(key, value string) error {
 	start := time.Now()
-	_, kv.err = kv.cli.Put(context.TODO(), key, value)
-	if kv.err != nil {
-		kv.logger.Error("Error writing KV store ", zap.Error(kv.err))
+	_, err := kv.cli.Put(context.TODO(), key, value)
+	if err != nil {
+		kv.logger.Error("Error writing KV store ", zap.Error(err))
+		return err
 	} else {
 		kv.logger.Info("Successfully put to etcd - ", zap.String("key", key), zap.String("value", value))
 		elapsed := time.Since(start)
 		kv.logger.Info("Put to etcd took", zap.Duration("duration", elapsed))
+		return nil
 	}
-
 }
 
 // Get fetches data from KV store
-func (kv *KV) Get(key string) string {
+func (kv *KV) Get(key string) (string, error) {
 	start := time.Now()
 	getResp, err := kv.cli.Get(context.TODO(), key)
 	if err != nil {
-		kv.logger.Error("Error Reading KV store ", zap.Error(kv.err))
+		kv.logger.Error("Error Reading KV store ", zap.Error(err))
+		return "{}", err
 	}
 
 	if getResp.Count >= 1 {
 		kv.logger.Info("Successfully got from etcd - ", zap.ByteString("key", getResp.Kvs[0].Key), zap.ByteString("value", getResp.Kvs[0].Value))
 		elapsed := time.Since(start)
 		kv.logger.Info("Get from etcd took", zap.Duration("duration", elapsed))
-		return string(getResp.Kvs[0].Value)
+		return string(getResp.Kvs[0].Value), nil
+	} else {
+		return "{}", err
 	}
-	return "{}"
 
 }
 
 // GetFromKey fetches data after a time range
-func (kv *KV) GetFromKey(key string) string {
+func (kv *KV) GetFromKey(key string) (string, error) {
 	start := time.Now()
 	getResp, err := kv.cli.Get(context.TODO(), key, clientv3.WithFromKey(), clientv3.WithLimit(0))
 	if err != nil {
-		kv.logger.Error("Error Reading KV store ", zap.Error(kv.err))
+		kv.logger.Error("Error Reading KV store ", zap.Error(err))
+		return "{}", err
 	}
 
 	if getResp.Count >= 1 {
@@ -90,19 +94,20 @@ func (kv *KV) GetFromKey(key string) string {
 		}
 		rb2 := strings.TrimSuffix(rb1.String(), ",")
 		rb2 = rb2 + "]"
-		return rb2
+		return rb2, nil
+	} else {
+		kv.logger.Info("No Value found for key - ", zap.String("key", key))
+		return "{}", nil
 	}
-	kv.logger.Info("No Value found for key - ", zap.String("key", key))
-	return "{}"
-
 }
 
 // GetFromKeyWithLimit fetches data after a time range with limit
-func (kv *KV) GetFromKeyWithLimit(key string, limit int64) string {
+func (kv *KV) GetFromKeyWithLimit(key string, limit int64) (string, error) {
 	start := time.Now()
 	getResp, err := kv.cli.Get(context.TODO(), key, clientv3.WithFromKey(), clientv3.WithLimit(limit))
 	if err != nil {
-		kv.logger.Error("Error Reading KV store ", zap.Error(kv.err))
+		kv.logger.Error("Error Reading KV store ", zap.Error(err))
+		return "{}", nil
 	}
 
 	if getResp.Count >= 1 {
@@ -118,9 +123,10 @@ func (kv *KV) GetFromKeyWithLimit(key string, limit int64) string {
 		}
 		rb2 := strings.TrimSuffix(rb1.String(), ",")
 		rb2 = rb2 + "]"
-		return rb2
+		return rb2, nil
+	} else {
+		kv.logger.Info("No Value found for key - ", zap.String("key", key))
+		return "{}", nil
 	}
-	kv.logger.Info("No Value found for key - ", zap.String("key", key))
-	return "{}"
 
 }

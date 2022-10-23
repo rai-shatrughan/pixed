@@ -1,16 +1,16 @@
-package mware
+package util
 
 import (
 	"go.uber.org/zap"
 )
 
-//Logger is wrapper for zap
+// Logger is wrapper for zap
 type Logger struct {
 	*zap.Logger
 	err error
 }
 
-//New returns a instance of logger
+// New returns a instance of logger
 func (l *Logger) New() {
 	l.Logger, l.err = zap.NewProduction()
 	if l.err != nil {

@@ -1,4 +1,4 @@
-package mware
+package util
 
 import (
 	"context"
@@ -61,8 +61,7 @@ func (kf *KafkaWriter) New(conf *Config, logger *Logger) {
 }
 
 // Read returns kafka Message
-func (kf *KafkaReaders) Read(reader *kafka.Reader) kafka.Message {
-
+func (kf *KafkaReaders) Read(reader *kafka.Reader) (kafka.Message, error) {
 	kf.logger.Info("Reading message from group",
 		zap.String("groupId", reader.Config().GroupID),
 	)
@@ -75,13 +74,13 @@ func (kf *KafkaReaders) Read(reader *kafka.Reader) kafka.Message {
 	msg, err := reader.ReadMessage(context.Background())
 	if err != nil {
 		kf.logger.Error("Error in Reading msg from Kafka ", zap.Error(err))
+		return msg, err
 	}
 	elapsed = time.Since(start)
 
 	kf.logger.Info("Kafka Read", zap.Duration("duration", elapsed))
 
-	return msg
-
+	return msg, nil
 }
 
 // Write pushes data to kafka
@@ -102,11 +101,10 @@ func (kf *KafkaWriter) Write(key, value []byte) error {
 	} else {
 		return nil
 	}
-
 }
 
 // BatchWrite puts data into batches
-func (kf *KafkaWriter) BatchWrite(key, val [][]byte) {
+func (kf *KafkaWriter) BatchWrite(key, val [][]byte) error {
 
 	msgs := make([]kafka.Message, len(key))
 	for k := range key {
@@ -121,8 +119,10 @@ func (kf *KafkaWriter) BatchWrite(key, val [][]byte) {
 
 	if err != nil {
 		kf.logger.Error("Error Writing msg to Kafka ", zap.Error(err))
+		return err
 	}
 
+	return nil
 }
 
 func (kf *KafkaWriter) closeWriter() {
@@ -139,7 +139,6 @@ func (kf *KafkaReaders) closeReaders() {
 			kf.logger.Error("Failed to close kafka reader", zap.Error(err))
 		}
 	}
-
 }
 
 func (kf *KafkaReaders) setupCloseReaderHandler() {

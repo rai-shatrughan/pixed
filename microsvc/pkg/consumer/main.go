@@ -15,7 +15,7 @@ import (
 
 	// websvc modules
 	md "microsvc/pkg/model"
-	mw "microsvc/pkg/mware"
+	"microsvc/pkg/util"
 )
 
 var (
@@ -26,9 +26,9 @@ var (
 	kafkaMsgChan     = make(chan kafka.Message, chanBufferSize)
 	tskvChan         = make(chan tskv, chanBufferSize*3)
 	kvCounterChan    = make(chan int8, chanBufferSize*3)
-	etc              = mw.KV{}
-	kf               = mw.KafkaReaders{}
-	logger           = mw.Logger{}
+	etc              = util.KV{}
+	kf               = util.KafkaReaders{}
+	logger           = util.Logger{}
 	ctx, cancel      = context.WithCancel(context.Background())
 )
 
@@ -38,7 +38,7 @@ type tskv struct {
 }
 
 func init() {
-	conf := mw.Config{}
+	conf := util.Config{}
 	conf.New()
 
 	logger.New()
@@ -136,7 +136,12 @@ func readKafkaMsg(reader *kafka.Reader, kafkaMsgChan chan<- kafka.Message) {
 			logger.Info("stopping reader")
 			return
 		default:
-			kafkaMsgChan <- kf.Read(reader)
+			msg, err := kf.Read(reader)
+			if err != nil {
+				logger.Error(err.Error())
+			} else {
+				kafkaMsgChan <- msg
+			}
 		}
 
 	}

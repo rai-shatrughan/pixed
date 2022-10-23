@@ -84,18 +84,18 @@ services:
       sr_cluster_network:
         ipv4_address: ${ETCD1_IP}
 
-  ts:
+  ws:
     build:
       context: ../
-      dockerfile: ./docker/app/Dockerfile-ts
-    container_name: ts
-    image: ts:v1
+      dockerfile: ./docker/app/Dockerfile-ws
+    container_name: ws
+    image: ws:v1
     restart: always
-    entrypoint: ["/usr/bin/ts-server"]
+    entrypoint: ["/usr/bin/ws"]
     environment:
       - KAFKA_BROKERS=${KAFKA_IP}:9092
     expose:
-      - 8002
+      - 8000
     volumes:
       - /data/asset:/data/asset
     networks:
