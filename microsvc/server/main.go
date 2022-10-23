@@ -7,43 +7,39 @@ import (
 	"os/signal"
 	"syscall"
 
+	"microsvc/domain/mc"
 	"microsvc/domain/stream"
-	"microsvc/domain/timeseries"
 	"microsvc/pkg/util"
 
-	"github.com/go-kit/kit/log"
+	"go.uber.org/zap"
 )
 
 var (
-	conf       = util.Config{}
-	mwLogger   = util.Logger{}
-	logger     log.Logger
-	httpAddr   string
-	mux        *http.ServeMux
-	httpLogger log.Logger
+	conf     util.Config
+	logger   util.Logger
+	httpAddr string
+	serveMux *http.ServeMux
+	kf       util.KafkaWriter
+	kv       util.KV
 )
 
 func init() {
 	conf.New()
-	mwLogger.New()
+	logger.New()
+
+	kv.New(&conf, &logger)
+	kf.New(&conf, &logger)
 
 	httpAddr = conf.GetString("http.address")
-	mux = http.NewServeMux()
-
-	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-	logger = log.With(logger, "ws", log.DefaultTimestampUTC)
-	httpLogger = log.With(logger, "component", "http")
+	serveMux = http.NewServeMux()
 }
 
 func main() {
 
-	ts := timeseries.NewService(&conf, &mwLogger)
+	serveMux.Handle(conf.GetString("basepath.stream"), stream.StreamHandler(&conf))
+	serveMux.Handle(conf.GetString("basepath.exchange"), mc.ExchangeHandler(&kf, &conf, &logger))
 
-	mux.Handle(conf.GetString("basepath.timeseries"), timeseries.MakeHandler(ts, httpLogger))
-
-	mux.Handle(conf.GetString("basepath.stream"), stream.StreamHandler(conf))
-
-	http.Handle("/", accessControl(mux))
+	http.Handle("/", accessControl(serveMux))
 
 	startServer()
 
@@ -52,7 +48,7 @@ func main() {
 func startServer() {
 	errs := make(chan error, 2)
 	go func() {
-		logger.Log("transport", "http", "address", httpAddr, "msg", "listening")
+		logger.Info("Server Started on", zap.String("Address", httpAddr))
 		errs <- http.ListenAndServe(httpAddr, nil)
 	}()
 	go func() {
@@ -60,8 +56,8 @@ func startServer() {
 		signal.Notify(c, syscall.SIGINT)
 		errs <- fmt.Errorf("%s", <-c)
 	}()
-
-	logger.Log("terminated", <-errs)
+	<-errs
+	logger.Info("terminated server")
 }
 
 func accessControl(h http.Handler) http.Handler {

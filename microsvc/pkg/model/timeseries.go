@@ -10,9 +10,9 @@ type Timeseries struct {
 }
 
 type TimeseriesValue struct {
-	DataPointId string      `json:"dataPointId"`
-	Value       interface{} `json:"value"`
-	QualityCode interface{} `json:"qualityCode"`
+	DataPointId string  `json:"dataPointId"`
+	Value       float64 `json:"value"`
+	QualityCode float64 `json:"qualityCode"`
 }
 
 type TimeseriesArray []Timeseries

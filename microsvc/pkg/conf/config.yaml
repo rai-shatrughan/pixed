@@ -17,6 +17,7 @@ http:
 basepath:
   timeseries: "/api/v1/timeseries/"
   stream: "/api/v1/stream/"
+  exchange: "/api/v1/exchange/"
 
 svc:
   stream:
