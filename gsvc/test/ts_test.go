@@ -11,7 +11,7 @@ import (
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-openapi/strfmt"
 
-	model "microsvc/pkg/model"
+	model "gsvc/pkg/model"
 )
 
 var (

@@ -84,14 +84,14 @@ services:
       sr_cluster_network:
         ipv4_address: ${ETCD1_IP}
 
-  ws:
+  gsvc:
     build:
       context: ../
-      dockerfile: ./docker/app/Dockerfile-ws
-    container_name: ws
-    image: ws:v1
+      dockerfile: ./docker/app/Dockerfile-gsvc
+    container_name: gsvc
+    image: gsvc:v1
     restart: always
-    entrypoint: ["/usr/bin/ws"]
+    entrypoint: ["/usr/bin/gsvc"]
     environment:
       - KAFKA_BROKERS=${KAFKA_IP}:9092
     expose:
@@ -100,7 +100,25 @@ services:
       - /data/asset:/data/asset
     networks:
       sr_cluster_network:
-        ipv4_address: ${SR_WS_IP}
+        ipv4_address: ${SR_GSVC_IP}
+    depends_on:
+      - kafka
+
+  rsvc:
+    build:
+      context: ../
+      dockerfile: ./docker/app/Dockerfile-rsvc
+    container_name: rsvc
+    image: rsvc:v1
+    restart: always
+    entrypoint: ["/usr/bin/rsvc"]
+    environment:
+      - KAFKA_BROKERS=${KAFKA_IP}:9092
+    expose:
+      - 9000
+    networks:
+      sr_cluster_network:
+        ipv4_address: ${SR_RSVC_IP}
     depends_on:
       - kafka
 

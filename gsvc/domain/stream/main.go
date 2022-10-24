@@ -3,7 +3,7 @@ package stream
 import (
 	"net/http"
 
-	"microsvc/pkg/util"
+	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"
 )

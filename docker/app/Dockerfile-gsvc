@@ -1,4 +1,4 @@
 #FROM debian:bullseye-slim
 FROM scratch
 COPY docker/app/conf/config.yaml /conf/config.yaml
-COPY docker/app/bin/ws /usr/bin/ws
+COPY docker/app/bin/gsvc /usr/bin/gsvc

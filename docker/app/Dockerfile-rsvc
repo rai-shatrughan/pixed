@@ -1,0 +1,3 @@
+FROM scratch
+COPY docker/app/bin/rsvc /usr/bin/rsvc
+ENV WEB_DIR=/dist

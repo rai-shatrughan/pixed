@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"microsvc/domain/mc"
-	"microsvc/domain/stream"
-	"microsvc/pkg/util"
+	"gsvc/domain/mc"
+	"gsvc/domain/stream"
+	"gsvc/pkg/util"
 
 	"go.uber.org/zap"
 )

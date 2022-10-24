@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"microsvc/pkg/model"
-	"microsvc/pkg/util"
+	"gsvc/pkg/model"
+	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"
 )
