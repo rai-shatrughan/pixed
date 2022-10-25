@@ -1,8 +1,36 @@
+dpath = /data
+dfolders = kafka zookeeper sql etcd1
+
 .PHONY: clean test perf bench
 
 clean:
 	rm -rf docker/app/bin
 	rm -rf docker/app/conf
+
+#create dir
+
+# cdir:
+# 	wd=$(dpath)
+#     if [[ -d $$wd ]]; then 
+#         echo "Removing " $$wd ; \
+#         sudo rm -rf $$wd ; \
+#     fi \
+
+#docker start
+
+cleand:
+	docker stop $$(docker ps -aq)
+	docker rm $$(docker ps -aq)
+
+startd:
+	cd docker; \
+	docker-compose --env-file .env -f docker-compose.yml down; \
+	docker-compose --env-file .env -f docker-compose.yml up -d
+
+cnd:
+	docker network create --driver=bridge --subnet=172.18.0.0/23 sr_cluster_network
+
+#docker end
 
 test:
 	cd gsvc; \
