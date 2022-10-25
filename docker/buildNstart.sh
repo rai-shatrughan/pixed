@@ -81,7 +81,7 @@ crate_dir(){
 2down_containers
 3recreate_dir
 4build_go_svc
-4build_rust_svc
+# 4build_rust_svc
 5recreate_containers
 #6setup_db
 7clean_app_bin

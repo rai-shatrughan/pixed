@@ -11,16 +11,17 @@ import (
 	"gsvc/domain/stream"
 	"gsvc/pkg/util"
 
+	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
 
 var (
-	conf     util.Config
-	logger   util.Logger
-	httpAddr string
-	serveMux *http.ServeMux
-	kf       util.KafkaWriter
-	kv       util.KV
+	conf      util.Config
+	logger    util.Logger
+	httpAddr  string
+	muxRouter *mux.Router
+	kf        util.KafkaWriter
+	kv        util.KV
 )
 
 func init() {
@@ -31,15 +32,18 @@ func init() {
 	kf.New(&conf, &logger)
 
 	httpAddr = conf.GetString("http.address")
-	serveMux = http.NewServeMux()
+	muxRouter = mux.NewRouter()
 }
 
 func main() {
+	streamPath := conf.GetString("basepath.stream")
+	exPath := conf.GetString("basepath.exchange") + "{assetId}"
 
-	serveMux.Handle(conf.GetString("basepath.stream"), stream.StreamHandler(&conf))
-	serveMux.Handle(conf.GetString("basepath.exchange"), mc.ExchangeHandler(&kf, &conf, &logger))
+	muxRouter.Handle(streamPath, stream.StreamHandler(&conf))
+	muxRouter.Handle(exPath, mc.PostTimeseries(&kf, &logger)).Methods("POST")
+	muxRouter.Handle(exPath, mc.GetTimeseries(&kv, &logger)).Methods("GET")
 
-	http.Handle("/", accessControl(serveMux))
+	http.Handle("/", accessControl(muxRouter))
 
 	startServer()
 
@@ -49,7 +53,7 @@ func startServer() {
 	errs := make(chan error, 2)
 	go func() {
 		logger.Info("Server Started on", zap.String("Address", httpAddr))
-		errs <- http.ListenAndServe(httpAddr, nil)
+		errs <- http.ListenAndServe(httpAddr, muxRouter)
 	}()
 	go func() {
 		c := make(chan os.Signal)
