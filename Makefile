@@ -8,6 +8,10 @@ test:
 	cd gsvc; \
 	go test test/exch_test.go -args -host gsvc
 
+testr:
+	cd gsvc; \
+	go test test/exch_test.go -args -host rsvc
+
 perf:
 	cd gsvc; \
 	bash test/runGowrk.sh
