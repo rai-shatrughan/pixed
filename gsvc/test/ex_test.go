@@ -15,14 +15,14 @@ import (
 )
 
 var (
-	tsBaseURL  = "http://172.18.0.21:8000/api/v1/timeseries"
-	baseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
+	exBaseURL    = "http://localhost:9000/api/v1/exchange"
+	exBaseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
 )
 
-func TestPutTimeSeries(t *testing.T) {
-	tsa := getTS()
-	e := httpexpect.New(t, tsBaseURL)
-	obj := e.PUT(baseEntity).
+func TestPostExTimeSeries(t *testing.T) {
+	tsa := getExTS()
+	e := httpexpect.New(t, exBaseURL)
+	obj := e.POST(exBaseEntity).
 		WithHeader("X-API-Key", "sr12345").
 		WithHeader("Content-Type", "application/json").
 		WithJSON(tsa).
@@ -35,41 +35,7 @@ func TestPutTimeSeries(t *testing.T) {
 
 }
 
-func TestGetTimeSeries(t *testing.T) {
-	e := httpexpect.New(t, tsBaseURL)
-	obj := e.GET(baseEntity).
-		WithHeader("X-API-Key", "sr12345").
-		WithQuery("duration", "1m").
-		Expect().
-		Status(http.StatusOK).
-		JSON().
-		Array()
-
-	obj.First().Object().Value("values")
-}
-
-func BenchmarkPostTimeSeries(b *testing.B) {
-
-	e := httpexpect.New(b, tsBaseURL)
-
-	for n := 0; n < b.N; n++ {
-		// myid := uuid.New()
-		myid := baseEntity
-		tsa := getTS()
-		obj := e.PUT(myid).
-			WithHeader("X-API-Key", "sr12345").
-			WithHeader("Content-Type", "application/json").
-			WithJSON(tsa).
-			Expect().
-			Status(http.StatusOK).
-			JSON().
-			Object()
-
-		obj.Value("TimeseriesUpload").Equal("Ok")
-	}
-}
-
-func getTS() []model.Timeseries {
+func getExTS() []model.Timeseries {
 
 	dateTime := strfmt.DateTime(time.Now().UTC())
 

@@ -1,5 +1,5 @@
 use axum::{
-    routing::{get, put, get_service},
+    routing::{get, put, post, get_service},
     extract::Extension,
     Router,
     http::StatusCode,
@@ -29,7 +29,7 @@ async fn main() {
     let app = Router::new()
                 .route("/api/v1/am", get(handler::asset::hello))
                 .route("/api/v1/timeseries/:asset_id", put(handler::timeseries::ts_put))
-                // .route("/api/v1/exchange/:asset_id", post(handler::exchange::post_ts))
+                .route("/api/v1/exchange/:asset_id", post(handler::exchange::post_multi_ts))
                 .layer(Extension(kafka_producer))
                 .layer(TraceLayer::new_for_http())
                 .fallback(get_service(service).handle_error(handle_error));

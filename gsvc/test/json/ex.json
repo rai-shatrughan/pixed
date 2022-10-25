@@ -1,0 +1,39 @@
+--f0Ve5iPP2ySppIcDSR6Bak
+Content-Type: multipart/related;boundary=penFL6sBQHJJUN3HA4ftqC
+
+--penFL6sBQHJJUN3HA4ftqC
+Content-Type: application/vnd.siemens.mindsphere.meta+json
+
+{
+    "type": "item",
+    "version": "1.0",
+    "payload": {
+        "type": "standardTimeSeries",
+        "version": "1.0",
+        "details": {
+            "configurationId": ""
+        }
+    }
+}
+--penFL6sBQHJJUN3HA4ftqC
+Content-Type: application/json
+
+[
+    {
+        "timestamp": "2017-02-01T08:30:03.780Z",
+        "values": [
+            {
+                "dataPointId": "dp1",
+                "value": 9856,
+                "qualityCode": 0
+            },
+            {
+                "dataPointId": "dp2",
+                "value": 3766,
+                "qualityCode": 0
+            }
+        ]
+    }
+]
+--penFL6sBQHJJUN3HA4ftqC--
+--f0Ve5iPP2ySppIcDSR6Bak--

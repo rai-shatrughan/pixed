@@ -74,6 +74,7 @@ crate_dir(){
     echo "removing app/bin/ and app/conf"
     rm -rf app/bin
     rm -rf app/conf
+    docker image prune -f
 }
 
 1create_network
