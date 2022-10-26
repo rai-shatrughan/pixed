@@ -8,13 +8,23 @@ import (
 	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	oteltrace "go.opentelemetry.io/otel/trace"
 )
+
+var tracer = otel.Tracer("mux-server")
 
 func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body model.TimeseriesArray
 		vars := mux.Vars(r)
+
 		assetId, ok := vars["assetId"]
+
+		_, span := tracer.Start(r.Context(), "postTS", oteltrace.WithAttributes(attribute.String("assetId", assetId)))
+		defer span.End()
+
 		if !ok {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("AssetId Missing in Path"))

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,16 +15,19 @@ import (
 	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.uber.org/zap"
 )
 
 var (
-	conf      util.Config
-	logger    util.Logger
-	httpAddr  string
-	muxRouter *mux.Router
-	kf        util.KafkaWriter
-	kv        util.KV
+	conf        util.Config
+	logger      util.Logger
+	httpAddr    string
+	muxRouter   *mux.Router
+	kf          util.KafkaWriter
+	kv          util.KV
+	serviceName = os.Getenv("SERVICE_NAME")
+	jaegerIP    = os.Getenv("JAEGER_IP")
 )
 
 func init() {
@@ -37,6 +42,17 @@ func init() {
 }
 
 func main() {
+	url := fmt.Sprintf("http://%s:14268/api/traces", jaegerIP)
+	tp, err := mware.InitTracer(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
+
 	streamPath := conf.GetString("basepath.stream")
 	exPath := conf.GetString("basepath.exchange") + "{assetId}"
 
@@ -54,6 +70,7 @@ func main() {
 		Path(streamPath).
 		Handler(stream.StreamHandler(&conf))
 
+	muxRouter.Use(otelmux.Middleware(serviceName))
 	muxRouter.Use(mware.Logging)
 	muxRouter.Use(mware.AccessControl)
 	muxRouter.Use(mware.ResponseContentType)
