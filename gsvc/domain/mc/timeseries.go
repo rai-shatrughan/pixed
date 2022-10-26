@@ -12,8 +12,6 @@ import (
 
 func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-
 		var body model.TimeseriesArray
 		vars := mux.Vars(r)
 		assetId, ok := vars["assetId"]
@@ -47,8 +45,6 @@ func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 
 func GetTimeseries(kv *util.KV, logger *util.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-
 		vars := mux.Vars(r)
 		assetId, ok := vars["assetId"]
 		if !ok {

@@ -1,7 +1,7 @@
 dpath = /data
 dfolders = kafka zookeeper sql etcd1
 
-.PHONY: clean test perf bench
+.PHONY: clean test perf bench gsvc rsvc cons
 
 clean:
 	rm -rf docker/app/bin
@@ -10,10 +10,10 @@ clean:
 #create dir
 
 # cdir:
-# 	wd=$(dpath)
-#     if [[ -d $$wd ]]; then 
-#         echo "Removing " $$wd ; \
-#         sudo rm -rf $$wd ; \
+# 	wd=$$(dpath)
+#     if [[ -d $$wd ]] then \
+#         echo "Removing " $$wd  \
+#         sudo rm -rf $$wd  \
 #     fi \
 
 #docker start

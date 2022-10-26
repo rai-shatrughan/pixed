@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"gsvc/domain/mc"
+	"gsvc/domain/mware"
 	"gsvc/domain/stream"
 	"gsvc/pkg/util"
 
@@ -39,11 +40,23 @@ func main() {
 	streamPath := conf.GetString("basepath.stream")
 	exPath := conf.GetString("basepath.exchange") + "{assetId}"
 
-	muxRouter.Handle(streamPath, stream.StreamHandler(&conf))
-	muxRouter.Handle(exPath, mc.PostTimeseries(&kf, &logger)).Methods("POST")
-	muxRouter.Handle(exPath, mc.GetTimeseries(&kv, &logger)).Methods("GET")
+	muxRouter.
+		Path(exPath).
+		Handler(mc.PostTimeseries(&kf, &logger)).
+		Methods("POST")
 
-	http.Handle("/", accessControl(muxRouter))
+	muxRouter.
+		Path(exPath).
+		Handler(mc.GetTimeseries(&kv, &logger)).
+		Methods("GET")
+
+	muxRouter.
+		Path(streamPath).
+		Handler(stream.StreamHandler(&conf))
+
+	muxRouter.Use(mware.Logging)
+	muxRouter.Use(mware.AccessControl)
+	muxRouter.Use(mware.ResponseContentType)
 
 	startServer()
 
@@ -62,18 +75,4 @@ func startServer() {
 	}()
 	<-errs
 	logger.Info("terminated server")
-}
-
-func accessControl(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
-
-		if r.Method == "OPTIONS" {
-			return
-		}
-
-		h.ServeHTTP(w, r)
-	})
 }
