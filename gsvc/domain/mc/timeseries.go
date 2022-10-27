@@ -7,12 +7,10 @@ import (
 	"gsvc/pkg/model"
 	"gsvc/pkg/util"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	oteltrace "go.opentelemetry.io/otel/trace"
-	"go.uber.org/zap"
 )
 
 var tracer = otel.Tracer("mux-server")
@@ -22,7 +20,6 @@ func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 		var body model.TimeseriesArray
 
 		vars := mux.Vars(r)
-
 		assetId, ok := vars["assetId"]
 
 		_, span := tracer.Start(r.Context(), "postTS", oteltrace.WithAttributes(attribute.String("assetId", assetId)))
@@ -40,21 +37,15 @@ func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 			return
 		}
 
-		validate := validator.New()
-		for _, ts := range body {
-			err := validate.Struct(ts)
-			if err != nil {
-				logger.Error("Error in processing TS request", zap.Error(err))
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
+		if err := body.Validate(); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
 		}
 
 		kfmsg, _ := json.Marshal(body)
 
-		err := kf.Write([]byte(assetId), []byte(kfmsg))
-
-		if err != nil {
+		if err := kf.Write([]byte(assetId), []byte(kfmsg)); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Could not write TS, retry after sometime"))
 			logger.Error(err.Error())

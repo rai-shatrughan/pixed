@@ -87,16 +87,23 @@ func getTS() []model.Timeseries {
 
 	dateTime := strfmt.DateTime(time.Now().UTC())
 
+	dp1 := "dp1"
+	dp2 := "dp2"
+	v1 := 12.0
+	v2 := 100.0
+	q1 := 0.0
+	q2 := 1.0
+
 	val1 := model.TimeseriesValue{
-		DataPointId: "dp1",
-		Value:       12,
-		QualityCode: 0,
+		DataPointId: &dp1,
+		Value:       &v1,
+		QualityCode: &q1,
 	}
 
 	val2 := model.TimeseriesValue{
-		DataPointId: "dp2",
-		Value:       15,
-		QualityCode: 1,
+		DataPointId: &dp2,
+		Value:       &v2,
+		QualityCode: &q2,
 	}
 
 	ts1 := model.Timeseries{
