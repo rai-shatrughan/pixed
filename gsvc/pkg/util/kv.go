@@ -45,7 +45,7 @@ func (kv *KV) Put(key, value string) error {
 		kv.logger.Error("Error writing KV store ", zap.Error(err))
 		return err
 	} else {
-		kv.logger.Info("Successfully put to etcd - ", zap.String("key", key), zap.String("value", value))
+		kv.logger.Debug("Successfully put to etcd - ", zap.String("key", key), zap.String("value", value))
 		elapsed := time.Since(start)
 		kv.logger.Info("Put to etcd took", zap.Duration("duration", elapsed))
 		return nil
@@ -62,7 +62,7 @@ func (kv *KV) Get(key string) (string, error) {
 	}
 
 	if getResp.Count >= 1 {
-		kv.logger.Info("Successfully got from etcd - ", zap.ByteString("key", getResp.Kvs[0].Key), zap.ByteString("value", getResp.Kvs[0].Value))
+		kv.logger.Debug("Successfully got from etcd - ", zap.ByteString("key", getResp.Kvs[0].Key), zap.ByteString("value", getResp.Kvs[0].Value))
 		elapsed := time.Since(start)
 		kv.logger.Info("Get from etcd took", zap.Duration("duration", elapsed))
 		return string(getResp.Kvs[0].Value), nil
@@ -86,11 +86,11 @@ func (kv *KV) GetFromKey(key string) (string, error) {
 		kv.logger.Info("Get from etcd took", zap.Duration("duration", elapsed))
 		var rb1 strings.Builder
 		rb1.WriteString("[")
-		kv.logger.Info("Successfully got values for key - ", zap.String("key", key), zap.Int64("count", getResp.Count))
+		kv.logger.Debug("Successfully got values for key - ", zap.String("key", key), zap.Int64("count", getResp.Count))
 		for _, ev := range getResp.Kvs {
 			rb1.WriteString(string(ev.Value))
 			rb1.WriteString(",")
-			kv.logger.Info("Successfully got value for key - ", zap.ByteString("key", ev.Key), zap.ByteString("value", ev.Value))
+			kv.logger.Debug("Successfully got value for key - ", zap.ByteString("key", ev.Key), zap.ByteString("value", ev.Value))
 		}
 		rb2 := strings.TrimSuffix(rb1.String(), ",")
 		rb2 = rb2 + "]"
@@ -115,11 +115,11 @@ func (kv *KV) GetFromKeyWithLimit(key string, limit int64) (string, error) {
 		kv.logger.Info("Get from etcd took", zap.Duration("duration", elapsed))
 		var rb1 strings.Builder
 		rb1.WriteString("[")
-		kv.logger.Info("Successfully got values for key - ", zap.String("key", key), zap.Int64("count", getResp.Count))
+		kv.logger.Debug("Successfully got values for key - ", zap.String("key", key), zap.Int64("count", getResp.Count))
 		for _, ev := range getResp.Kvs {
 			rb1.WriteString(string(ev.Value))
 			rb1.WriteString(",")
-			kv.logger.Info("Successfully got value for key - ", zap.ByteString("key", ev.Key), zap.ByteString("value", ev.Value))
+			kv.logger.Debug("Successfully got value for key - ", zap.ByteString("key", ev.Key), zap.ByteString("value", ev.Value))
 		}
 		rb2 := strings.TrimSuffix(rb1.String(), ",")
 		rb2 = rb2 + "]"

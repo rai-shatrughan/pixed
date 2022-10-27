@@ -7,10 +7,12 @@ import (
 	"gsvc/pkg/model"
 	"gsvc/pkg/util"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	oteltrace "go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 )
 
 var tracer = otel.Tracer("mux-server")
@@ -18,6 +20,7 @@ var tracer = otel.Tracer("mux-server")
 func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body model.TimeseriesArray
+
 		vars := mux.Vars(r)
 
 		assetId, ok := vars["assetId"]
@@ -35,6 +38,16 @@ func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
 			return
+		}
+
+		validate := validator.New()
+		for _, ts := range body {
+			err := validate.Struct(ts)
+			if err != nil {
+				logger.Error("Error in processing TS request", zap.Error(err))
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
 		}
 
 		kfmsg, _ := json.Marshal(body)

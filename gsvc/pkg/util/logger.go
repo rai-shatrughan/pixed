@@ -2,6 +2,7 @@ package util
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Logger is wrapper for zap
@@ -12,7 +13,14 @@ type Logger struct {
 
 // New returns a instance of logger
 func (l *Logger) New() {
-	l.Logger, l.err = zap.NewProduction()
+	// this or zap.NewProduction()
+	config := zap.NewProductionConfig()
+	config.EncoderConfig.TimeKey = "timestamp"
+	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	l.Logger, l.err = config.Build()
+
+	// l.Logger, l.err = zap.NewProduction()
+
 	if l.err != nil {
 		l.Error("Can't initialize zap logger: %v", zap.Error(l.err))
 	}
