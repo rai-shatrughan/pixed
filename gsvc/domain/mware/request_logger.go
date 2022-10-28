@@ -9,49 +9,52 @@ import (
 
 // responseWriter is a minimal wrapper for http.ResponseWriter that allows the
 // written HTTP status code to be captured for logging.
-type responseWriter struct {
+type responseObserver struct {
 	http.ResponseWriter
 	status      int
+	written     int64
 	wroteHeader bool
 }
 
-func wrapResponseWriter(w http.ResponseWriter) *responseWriter {
-	return &responseWriter{ResponseWriter: w}
+func (o *responseObserver) Write(p []byte) (n int, err error) {
+	if !o.wroteHeader {
+		o.WriteHeader(http.StatusOK)
+	}
+	n, err = o.ResponseWriter.Write(p)
+	o.written += int64(n)
+	return
 }
 
-func (rw *responseWriter) Status() int {
-	return rw.status
-}
-
-func (rw *responseWriter) WriteHeader(code int) {
-	if rw.wroteHeader {
+func (o *responseObserver) WriteHeader(code int) {
+	o.ResponseWriter.WriteHeader(code)
+	if o.wroteHeader {
 		return
 	}
-
-	rw.status = code
-	rw.ResponseWriter.WriteHeader(code)
-	rw.wroteHeader = true
+	o.wroteHeader = true
+	o.status = code
 }
 
 // LoggingMiddleware logs the incoming HTTP request & its duration.
 func LoggingMiddleware(log *util.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
-			defer func() {
-				if err := recover(); err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					log.Error("Error from log handler")
-				}
-			}()
-
 			start := time.Now()
-			wrapped := wrapResponseWriter(w)
-			next.ServeHTTP(wrapped, r)
+			obs := &responseObserver{ResponseWriter: w}
+			next.ServeHTTP(obs, r)
+			blank := " "
+			hyphen := "-"
+			// LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined
 			log.Sugar().Info(
-				" status - ", wrapped.status, ";",
-				" method - ", r.Method, ";",
-				" path - ", r.URL.EscapedPath(), ";",
-				" duration - ", time.Since(start), ";",
+				r.RemoteAddr, blank,
+				hyphen, blank,
+				r.URL.User, blank,
+				start.Format(time.RFC3339), blank,
+				r.Method, blank, r.URL.EscapedPath(), blank, r.Proto, blank,
+				obs.status, blank,
+				obs.written, blank,
+				time.Since(start), blank,
+				r.Referer(), blank,
+				r.UserAgent(),
 			)
 		}
 

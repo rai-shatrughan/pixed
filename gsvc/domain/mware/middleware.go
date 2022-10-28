@@ -2,9 +2,6 @@ package mware
 
 import (
 	"net/http"
-	"os"
-
-	"github.com/gorilla/handlers"
 )
 
 func AccessControl(next http.Handler) http.Handler {
@@ -26,8 +23,4 @@ func ResponseContentType(next http.Handler) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
-}
-
-func Logging(next http.Handler) http.Handler {
-	return handlers.LoggingHandler(os.Stdout, next)
 }
