@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"gsvc/domain/mware"
 	"gsvc/pkg/model"
 	"gsvc/pkg/util"
 
@@ -14,6 +15,8 @@ import (
 )
 
 var tracer = otel.Tracer("mux-server")
+var assetErrMsg = "assetId missing in path"
+var processErrMsg = "error in processing, retry after sometime"
 
 func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,28 +29,24 @@ func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 		defer span.End()
 
 		if !ok {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("AssetId Missing in Path"))
+			mware.ResponseWriter(w, assetErrMsg, http.StatusBadRequest)
 			return
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			mware.ResponseWriter(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		if err := body.Validate(); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			mware.ResponseWriter(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		kfmsg, _ := json.Marshal(body)
 
 		if err := kf.Write([]byte(assetId), []byte(kfmsg)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Could not write TS, retry after sometime"))
+			mware.ResponseWriter(w, processErrMsg, http.StatusBadRequest)
 			logger.Error(err.Error())
 			return
 		} else {
@@ -62,15 +61,13 @@ func GetTimeseries(kv *util.KV, logger *util.Logger) http.Handler {
 		vars := mux.Vars(r)
 		assetId, ok := vars["assetId"]
 		if !ok {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("AssetId Missing in Path"))
+			mware.ResponseWriter(w, assetErrMsg, http.StatusBadRequest)
 			return
 		}
 
 		res, err := kv.GetFromKeyWithLimit("/"+assetId, 1000)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Could not Fetch TS, retry after sometime"))
+			mware.ResponseWriter(w, processErrMsg, http.StatusBadRequest)
 			logger.Error(err.Error())
 		} else {
 			w.Write([]byte(res))

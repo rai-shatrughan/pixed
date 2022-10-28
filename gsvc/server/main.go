@@ -72,8 +72,7 @@ func main() {
 
 	muxRouter.Use(otelmux.Middleware(serviceName))
 	muxRouter.Use(mware.LoggingMiddleware(&logger))
-	muxRouter.Use(mware.AccessControl)
-	muxRouter.Use(mware.ResponseContentType)
+	muxRouter.Use(mware.SetAccessControl)
 
 	startServer()
 
