@@ -71,7 +71,7 @@ func main() {
 		Handler(stream.StreamHandler(&conf))
 
 	muxRouter.Use(otelmux.Middleware(serviceName))
-	muxRouter.Use(mware.Logging)
+	muxRouter.Use(mware.LoggingMiddleware(&logger))
 	muxRouter.Use(mware.AccessControl)
 	muxRouter.Use(mware.ResponseContentType)
 
