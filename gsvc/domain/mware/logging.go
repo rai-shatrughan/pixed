@@ -7,7 +7,7 @@ import (
 	"gsvc/pkg/util"
 )
 
-// responseWriter is a minimal wrapper for http.ResponseWriter that allows the
+// responseObserver is a minimal wrapper for http.ResponseWriter that allows the
 // written HTTP status code to be captured for logging.
 type responseObserver struct {
 	http.ResponseWriter
