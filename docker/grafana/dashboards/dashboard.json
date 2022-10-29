@@ -74,7 +74,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "vertx_http_server_active_connections",
+            "expr": "gsvc_http_server_active_connections",
             "format": "time_series",
             "interval": "",
             "intervalFactor": 2,
@@ -158,7 +158,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "round(sum(rate(vertx_http_server_requests_total[1m])) by (code), 0.001)",
+            "expr": "round(sum(rate(gsvc_http_server_requests_total[1m])) by (code), 0.001)",
             "format": "time_series",
             "intervalFactor": 2,
             "refId": "A"
@@ -240,7 +240,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "round(sum(rate(vertx_http_server_requests_total[1m])) by (code,route), 0.001)",
+            "expr": "round(sum(rate(gsvc_http_server_requests_total[1m])) by (code,route), 0.001)",
             "format": "time_series",
             "intervalFactor": 2,
             "refId": "A"
@@ -322,28 +322,28 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "sum(irate(vertx_http_server_response_time_seconds_sum[1m])) / sum(irate(vertx_http_server_response_time_seconds_count[1m]))",
+            "expr": "sum(irate(gsvc_http_server_response_time_seconds_sum[1m])) / sum(irate(gsvc_http_server_response_time_seconds_count[1m]))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "[avg]",
             "refId": "B"
           },
           {
-            "expr": "histogram_quantile(0.5, sum(rate(vertx_http_server_response_time_seconds_bucket[1m])) by (le))",
+            "expr": "histogram_quantile(0.5, sum(rate(gsvc_http_server_response_time_seconds_bucket[1m])) by (le))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "[med]",
             "refId": "D"
           },
           {
-            "expr": "histogram_quantile(0.95, sum(rate(vertx_http_server_response_time_seconds_bucket[1m])) by (le))",
+            "expr": "histogram_quantile(0.95, sum(rate(gsvc_http_server_response_time_seconds_bucket[1m])) by (le))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "[95p]",
             "refId": "A"
           },
           {
-            "expr": "histogram_quantile(0.99, sum(rate(vertx_http_server_response_time_seconds_bucket[1m])) by (le))",
+            "expr": "histogram_quantile(0.99, sum(rate(gsvc_http_server_response_time_seconds_bucket[1m])) by (le))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "[99p]",
@@ -426,21 +426,21 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "sum(irate(vertx_http_server_response_time_seconds_sum[1m])) by (route) / sum(irate(vertx_http_server_response_time_seconds_count[1m])) by (route)",
+            "expr": "sum(irate(gsvc_http_server_response_time_seconds_sum[1m])) by (route) / sum(irate(gsvc_http_server_response_time_seconds_count[1m])) by (route)",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "{{route}} [avg]",
             "refId": "B"
           },
           {
-            "expr": "histogram_quantile(0.5, sum(rate(vertx_http_server_response_time_seconds_bucket[1m])) by (le,route))",
+            "expr": "histogram_quantile(0.5, sum(rate(gsvc_http_server_response_time_seconds_bucket[1m])) by (le,route))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "{{route}} [med]",
             "refId": "A"
           },
           {
-            "expr": "histogram_quantile(0.99, sum(rate(vertx_http_server_response_time_seconds_bucket[1m])) by (le,route))",
+            "expr": "histogram_quantile(0.99, sum(rate(gsvc_http_server_response_time_seconds_bucket[1m])) by (le,route))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "{{route}} [99p]",
@@ -523,7 +523,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "vertx_eventbus_handlers",
+            "expr": "gsvc_eventbus_handlers",
             "format": "time_series",
             "interval": "",
             "intervalFactor": 2,
@@ -608,7 +608,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "vertx_eventbus_pending{side=\"local\"}",
+            "expr": "gsvc_eventbus_pending{side=\"local\"}",
             "format": "time_series",
             "instant": false,
             "interval": "",
@@ -693,7 +693,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "sum(irate(vertx_eventbus_sent_total[1m]))",
+            "expr": "sum(irate(gsvc_eventbus_sent_total[1m]))",
             "format": "time_series",
             "interval": "",
             "intervalFactor": 2,
@@ -701,14 +701,14 @@
             "refId": "A"
           },
           {
-            "expr": "sum(rate(vertx_eventbus_sent_total[1m]))",
+            "expr": "sum(rate(gsvc_eventbus_sent_total[1m]))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "1 minute rate",
             "refId": "C"
           },
           {
-            "expr": "sum(rate(vertx_eventbus_sent_total[5m]))",
+            "expr": "sum(rate(gsvc_eventbus_sent_total[5m]))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "5 minute rate",
@@ -791,21 +791,21 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "sum(irate(vertx_eventbus_received_total[1m]))",
+            "expr": "sum(irate(gsvc_eventbus_received_total[1m]))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "1 minute instant rate",
             "refId": "A"
           },
           {
-            "expr": "sum(rate(vertx_eventbus_received_total[1m]))",
+            "expr": "sum(rate(gsvc_eventbus_received_total[1m]))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "1 minute rate",
             "refId": "C"
           },
           {
-            "expr": "sum(rate(vertx_eventbus_received_total[5m]))",
+            "expr": "sum(rate(gsvc_eventbus_received_total[5m]))",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "5 minute rate",
