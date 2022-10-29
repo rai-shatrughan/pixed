@@ -15,6 +15,7 @@ import (
 	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.uber.org/zap"
 )
@@ -70,8 +71,11 @@ func main() {
 		Path(streamPath).
 		Handler(stream.StreamHandler(&conf))
 
+	muxRouter.Path("/metrics").Handler(promhttp.Handler())
+
 	muxRouter.Use(otelmux.Middleware(serviceName))
 	muxRouter.Use(mware.LoggingMiddleware(&logger))
+	muxRouter.Use(mware.PrometheusMiddleware)
 	muxRouter.Use(mware.SetAccessControl)
 
 	startServer()

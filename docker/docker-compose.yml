@@ -102,6 +102,32 @@ services:
       sr_cluster_network:
         ipv4_address: ${JAEGER_AGENT_IP}
 
+  prometheus:
+    image: "prom/prometheus:v2.35.0"
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /data/prometheus:/prometheus
+    expose:
+      - 9090
+    networks:
+      sr_cluster_network:
+        ipv4_address: ${PROMETHEUS_IP}
+
+  grafana:
+    image: "grafana/grafana-oss:8.5.3"
+    container_name: grafana
+    volumes:
+      - /data/grafana:/var/lib/grafana
+      - ./grafana/conf/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - 3000
+    networks:
+      sr_cluster_network:
+        ipv4_address: ${GRAFANA_IP}
+
   gsvc:
     build:
       context: ../
