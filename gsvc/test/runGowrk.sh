@@ -13,7 +13,7 @@ putTS(){
     start=`date`
     echo "Start Time - " $start
 
-    go-wrk -c 8000 -d 30 -T 30000 -M POST \
+    go-wrk -c 8000 -d 3600 -T 30000 -M POST \
         -H "X-API-Key: sr12345" \
         -H "Content-Type: application/json" \
         -body @test/json/ts.json \
@@ -45,4 +45,4 @@ getCurlTS(){
 }
 
 putTS
-getTS
+#getTS

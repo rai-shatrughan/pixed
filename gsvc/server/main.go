@@ -59,7 +59,9 @@ func main() {
 	}()
 
 	mdlw := middleware.New(middleware.Config{
-		Recorder: metrics.NewRecorder(metrics.Config{}),
+		Recorder: metrics.NewRecorder(metrics.Config{
+			Prefix: "gsvc",
+		}),
 	})
 
 	streamPath := conf.GetString("basepath.stream")
