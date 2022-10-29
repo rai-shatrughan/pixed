@@ -60,7 +60,7 @@ func main() {
 
 	mdlw := middleware.New(middleware.Config{
 		Recorder: metrics.NewRecorder(metrics.Config{
-			Prefix: "gsvc",
+			Prefix: serviceName,
 		}),
 	})
 

@@ -27,7 +27,7 @@ func InitTracer(url string) (*sdktrace.TracerProvider, error) {
 		return nil, err
 	}
 	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(0.1)),
+		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(0.001)),
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,

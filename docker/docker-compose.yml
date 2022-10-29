@@ -139,7 +139,7 @@ services:
     environment:
       - KAFKA_BROKERS=${KAFKA_IP}:9092
       - SERVICE_NAME=gsvc
-      - JAEGER_IP=172.18.0.91
+      - JAEGER_IP=${JAEGER_AGENT_IP}
     expose:
       - 8000
     volumes:
