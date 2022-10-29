@@ -192,7 +192,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "histogram_quantile(0.99,\n    rate(http_request_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.99,\n    rate(gsvc_http_request_duration_seconds_bucket[5m]))",
           "refId": "A"
         }
       ],
@@ -536,7 +536,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(\n    rate(http_request_duration_seconds_count[30s])\n) by (handler)",
+          "expr": "sum(\n    rate(gsvc_http_request_duration_seconds_count[30s])\n) by (handler)",
           "refId": "A"
         }
       ],
@@ -622,7 +622,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "histogram_quantile(0.9,\n    sum(\n        rate(http_request_duration_seconds_bucket[10m])\n    ) by (handler, le)\n)",
+          "expr": "histogram_quantile(0.9,\n    sum(\n        rate(gsvc_http_request_duration_seconds_bucket[10m])\n    ) by (handler, le)\n)",
           "refId": "A"
         }
       ],
@@ -708,7 +708,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "rate(http_request_duration_seconds_count{code=~\"5..\"}[30s])",
+          "expr": "rate(gsvc_http_request_duration_seconds_count{code=~\"5..\"}[30s])",
           "refId": "A"
         }
       ],
