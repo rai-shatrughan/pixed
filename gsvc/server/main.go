@@ -15,9 +15,13 @@ import (
 	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.uber.org/zap"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
+	"github.com/slok/go-http-metrics/middleware"
+	"github.com/slok/go-http-metrics/middleware/std"
 )
 
 var (
@@ -54,6 +58,10 @@ func main() {
 		}
 	}()
 
+	mdlw := middleware.New(middleware.Config{
+		Recorder: metrics.NewRecorder(metrics.Config{}),
+	})
+
 	streamPath := conf.GetString("basepath.stream")
 	exPath := conf.GetString("basepath.exchange") + "{assetId}"
 
@@ -75,7 +83,7 @@ func main() {
 
 	muxRouter.Use(otelmux.Middleware(serviceName))
 	muxRouter.Use(mware.LoggingMiddleware(&logger))
-	muxRouter.Use(mware.PrometheusMiddleware)
+	muxRouter.Use(std.HandlerProvider("", mdlw))
 	muxRouter.Use(mware.SetAccessControl)
 
 	startServer()
