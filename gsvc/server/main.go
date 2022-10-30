@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"gsvc/domain/mc"
-	"gsvc/domain/mware"
-	"gsvc/domain/stream"
+	"gsvc/handler/mc"
+	"gsvc/handler/stream"
+	"gsvc/mware"
 	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"

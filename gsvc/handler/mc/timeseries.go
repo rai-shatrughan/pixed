@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gsvc/domain/mware"
+	"gsvc/mware"
 	"gsvc/pkg/model"
 	"gsvc/pkg/util"
 
