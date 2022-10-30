@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,7 +13,7 @@ import (
 	"gsvc/pkg/util"
 
 	"github.com/gorilla/mux"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+
 	"go.uber.org/zap"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -48,16 +46,8 @@ func init() {
 }
 
 func main() {
-	url := fmt.Sprintf("http://%s:14268/api/traces", jaegerIP)
-	tp, err := mware.InitTracer(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err := tp.Shutdown(context.Background()); err != nil {
-			log.Printf("Error shutting down tracer provider: %v", err)
-		}
-	}()
+	tp := mware.InitTracer(jaegerIP, &logger)
+	defer mware.TracerShutDown(tp, &logger)
 
 	streamPath := conf.GetString("basepath.stream")
 	exPath := conf.GetString("basepath.exchange") + "{assetId}"
@@ -78,7 +68,7 @@ func main() {
 
 	muxRouter.Path("/metrics").Handler(promhttp.Handler())
 
-	muxRouter.Use(otelmux.Middleware(serviceName))
+	muxRouter.Use(mware.TracingMiddleware(serviceName))
 	muxRouter.Use(mware.LoggingMiddleware(&logger))
 	muxRouter.Use(mware.PrometheusMiddleware(mdlw))
 	muxRouter.Use(mware.SetAccessControl)
