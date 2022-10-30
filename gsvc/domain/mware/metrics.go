@@ -3,24 +3,22 @@ package mware
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
+	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
+	"github.com/slok/go-http-metrics/middleware"
+	"github.com/slok/go-http-metrics/middleware/std"
 )
 
-var (
-	httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "gsvc_http_duration_seconds",
-		Help: "Duration of HTTP requests.",
-	}, []string{"path"})
-)
-
-func PrometheusMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		route := mux.CurrentRoute(r)
-		path, _ := route.GetPathTemplate()
-		timer := prometheus.NewTimer(httpDuration.WithLabelValues(path))
-		next.ServeHTTP(w, r)
-		timer.ObserveDuration()
+func InitMetricMiddleware() middleware.Middleware {
+	return middleware.New(middleware.Config{
+		Recorder: metrics.NewRecorder(metrics.Config{
+			Prefix: serviceName,
+		}),
 	})
+}
+
+func PrometheusMiddleware(mdlw middleware.Middleware) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return std.Handler("", mdlw, next)
+	}
+
 }

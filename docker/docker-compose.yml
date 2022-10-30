@@ -105,6 +105,7 @@ services:
   prometheus:
     image: "prom/prometheus:v2.35.0"
     container_name: prometheus
+    restart: always
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - /data/prometheus:/prometheus
@@ -116,6 +117,7 @@ services:
 
   grafana:
     image: "grafana/grafana-oss:8.5.3"
+    restart: always
     container_name: grafana
     volumes:
       - /data/grafana:/var/lib/grafana

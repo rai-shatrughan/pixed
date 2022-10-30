@@ -19,9 +19,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
 	"github.com/slok/go-http-metrics/middleware"
-	"github.com/slok/go-http-metrics/middleware/std"
 )
 
 var (
@@ -33,6 +31,7 @@ var (
 	kv          util.KV
 	serviceName = os.Getenv("SERVICE_NAME")
 	jaegerIP    = os.Getenv("JAEGER_IP")
+	mdlw        middleware.Middleware
 )
 
 func init() {
@@ -44,6 +43,8 @@ func init() {
 
 	httpAddr = conf.GetString("http.address")
 	muxRouter = mux.NewRouter()
+
+	mdlw = mware.InitMetricMiddleware()
 }
 
 func main() {
@@ -57,12 +58,6 @@ func main() {
 			log.Printf("Error shutting down tracer provider: %v", err)
 		}
 	}()
-
-	mdlw := middleware.New(middleware.Config{
-		Recorder: metrics.NewRecorder(metrics.Config{
-			Prefix: serviceName,
-		}),
-	})
 
 	streamPath := conf.GetString("basepath.stream")
 	exPath := conf.GetString("basepath.exchange") + "{assetId}"
@@ -85,7 +80,7 @@ func main() {
 
 	muxRouter.Use(otelmux.Middleware(serviceName))
 	muxRouter.Use(mware.LoggingMiddleware(&logger))
-	muxRouter.Use(std.HandlerProvider("", mdlw))
+	muxRouter.Use(mware.PrometheusMiddleware(mdlw))
 	muxRouter.Use(mware.SetAccessControl)
 
 	startServer()
