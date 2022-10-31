@@ -7,8 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"gsvc/handler/mc"
-	"gsvc/handler/stream"
+	"gsvc/handler"
 	"gsvc/mware"
 	"gsvc/pkg/util"
 
@@ -16,7 +15,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/slok/go-http-metrics/middleware"
 )
 
@@ -49,25 +47,15 @@ func main() {
 	tp := mware.InitTracer(jaegerIP, &logger)
 	defer mware.TracerShutDown(tp, &logger)
 
-	streamPath := conf.GetString("basepath.stream")
-	exchange := conf.GetString("basepath.exchange") + "{assetId}"
-	timeseries := conf.GetString("basepath.timeseries") + "{assetId}"
+	hndlr := handler.SVCHandlers{
+		MuxRouter: muxRouter,
+		Conf:      &conf,
+		Logger:    &logger,
+		Kf:        &kf,
+		Kv:        &kv,
+	}
 
-	muxRouter.
-		Path(exchange).
-		Handler(mc.PostMixedTimeseries(&kf, &logger)).
-		Methods("POST")
-
-	muxRouter.
-		Path(timeseries).
-		Handler(mc.GetTimeseries(&kv, &logger)).
-		Methods("GET")
-
-	muxRouter.
-		Path(streamPath).
-		Handler(stream.StreamHandler(&conf))
-
-	muxRouter.Path("/metrics").Handler(promhttp.Handler())
+	hndlr.RegisterHandlers()
 
 	muxRouter.Use(mware.TracingMiddleware(serviceName))
 	muxRouter.Use(mware.LoggingMiddleware(&logger))
