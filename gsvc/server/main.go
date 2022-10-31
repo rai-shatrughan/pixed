@@ -50,15 +50,16 @@ func main() {
 	defer mware.TracerShutDown(tp, &logger)
 
 	streamPath := conf.GetString("basepath.stream")
-	exPath := conf.GetString("basepath.exchange") + "{assetId}"
+	exchange := conf.GetString("basepath.exchange") + "{assetId}"
+	timeseries := conf.GetString("basepath.timeseries") + "{assetId}"
 
 	muxRouter.
-		Path(exPath).
-		Handler(mc.PostTimeseries(&kf, &logger)).
+		Path(exchange).
+		Handler(mc.PostMixedTimeseries(&kf, &logger)).
 		Methods("POST")
 
 	muxRouter.
-		Path(exPath).
+		Path(timeseries).
 		Handler(mc.GetTimeseries(&kv, &logger)).
 		Methods("GET")
 

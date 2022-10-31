@@ -2,7 +2,9 @@ package mc
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
+	"strings"
 
 	"gsvc/mware"
 	"gsvc/pkg/model"
@@ -20,6 +22,47 @@ var (
 	processErrMsg    = "error in processing, retry after sometime"
 	uploadSuccessMsg = "{\"TimeseriesUpload\": \"Ok\"}"
 )
+
+func PostMixedTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var tsa model.TimeseriesArray
+		vars := mux.Vars(r)
+		assetId, ok := vars["assetId"]
+
+		_, span := tracer.Start(r.Context(), "postTS", oteltrace.WithAttributes(attribute.String("assetId", assetId)))
+		defer span.End()
+
+		if !ok {
+			mware.ResponseWriter(w, assetErrMsg, http.StatusBadRequest)
+			return
+		}
+
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			logger.Sugar().Errorln("Error in reading Multipart TS body", err)
+			mware.ResponseWriter(w, "", 500)
+		}
+
+		jsonWmp := strings.Split(string(body), "Content-Type: application/json")[1]
+		jsonBody := strings.Split(jsonWmp, "--")[0]
+
+		if err := json.Unmarshal([]byte(jsonBody), &tsa); err != nil {
+			mware.ResponseWriter(w, processErrMsg, http.StatusInternalServerError)
+			logger.Error(err.Error())
+		}
+
+		kfmsg := []byte(jsonBody)
+
+		if err := kf.Write([]byte(assetId), []byte(kfmsg)); err != nil {
+			mware.ResponseWriter(w, processErrMsg, http.StatusInternalServerError)
+			logger.Error(err.Error())
+			return
+		} else {
+			mware.ResponseWriter(w, uploadSuccessMsg, http.StatusOK)
+			return
+		}
+	})
+}
 
 func PostTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

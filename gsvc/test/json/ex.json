@@ -20,20 +20,36 @@ Content-Type: application/json
 
 [
     {
-        "timestamp": "2017-02-01T08:30:03.780Z",
+        "timestamp": "2022-10-01T08:30:03.780Z",
         "values": [
             {
                 "dataPointId": "dp1",
-                "value": 9856,
-                "qualityCode": 0
+                "value": 985,
+                "qualityCode": 1
             },
             {
                 "dataPointId": "dp2",
-                "value": 3766,
-                "qualityCode": 0
+                "value": 374,
+                "qualityCode": 1
+            }
+        ]
+    },
+    {
+        "timestamp": "2022-10-02T08:30:03.780Z",
+        "values": [
+            {
+                "dataPointId": "dp1",
+                "value": 987,
+                "qualityCode": 1
+            },
+            {
+                "dataPointId": "dp2",
+                "value": 376,
+                "qualityCode": 1
             }
         ]
     }
 ]
+
 --penFL6sBQHJJUN3HA4ftqC--
 --f0Ve5iPP2ySppIcDSR6Bak--

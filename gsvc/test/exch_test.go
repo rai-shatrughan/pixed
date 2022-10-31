@@ -4,7 +4,9 @@ import (
 	// "encoding/json"
 	// "fmt"
 
+	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -16,29 +18,31 @@ import (
 )
 
 var (
-	baseEntity = "6fdae6af-226d-48bd-8b61-699758137eb3"
-	tsBaseURL  string
-	host       = flag.String("host", "gsvc", "Name of service to test")
+	baseEntity          = "6fdae6af-226d-48bd-8b61-699758137eb3"
+	tsPostURL, tsGetURL string
+	host                = flag.String("host", "gsvc", "Name of service to test")
 )
 
 func hostCheck() {
 	if *host == "gsvc" {
-		tsBaseURL = "http://172.18.0.21:8000/api/v1/exchange"
+		tsPostURL = "http://172.18.0.21:8000/api/mindconnect/v3/exchange/"
+		tsGetURL = "http://172.18.0.21:8000/api/iottimeseries/v3/timeseries/"
 		// fmt.Println(*host)
 	} else {
-		tsBaseURL = "http://172.18.0.22:9000/api/v1/exchange"
+		tsPostURL = "http://172.18.0.22:9000/api/v1/exchange"
+		tsGetURL = "http://172.18.0.21:9000/api/iottimeseries/v3/timeseries/"
 		// fmt.Println(*host)
 	}
 }
 
 func TestPostTimeseries(t *testing.T) {
 	hostCheck()
-	tsa := getTS()
-	e := httpexpect.New(t, tsBaseURL)
+	tsBytes := getTSBytes()
+	e := httpexpect.New(t, tsPostURL)
 	obj := e.POST(baseEntity).
 		WithHeader("X-API-Key", "sr12345").
 		WithHeader("Content-Type", "application/json").
-		WithJSON(tsa).
+		WithBytes(tsBytes).
 		Expect().
 		Status(http.StatusOK).
 		JSON().
@@ -50,7 +54,7 @@ func TestPostTimeseries(t *testing.T) {
 
 func TestGetTimeSeries(t *testing.T) {
 	hostCheck()
-	e := httpexpect.New(t, tsBaseURL)
+	e := httpexpect.New(t, tsGetURL)
 	obj := e.GET(baseEntity).
 		WithHeader("X-API-Key", "sr12345").
 		WithQuery("duration", "1m").
@@ -64,16 +68,16 @@ func TestGetTimeSeries(t *testing.T) {
 
 func BenchmarkPostTimeSeries(b *testing.B) {
 	hostCheck()
-	e := httpexpect.New(b, tsBaseURL)
+	e := httpexpect.New(b, tsPostURL)
 
 	for n := 0; n < b.N; n++ {
 		// myid := uuid.New()
 		myid := baseEntity
-		tsa := getTS()
+		tsBytes := getTSBytes()
 		obj := e.POST(myid).
 			WithHeader("X-API-Key", "sr12345").
 			WithHeader("Content-Type", "application/json").
-			WithJSON(tsa).
+			WithBytes(tsBytes).
 			Expect().
 			Status(http.StatusOK).
 			JSON().
@@ -83,7 +87,7 @@ func BenchmarkPostTimeSeries(b *testing.B) {
 	}
 }
 
-func getTS() []model.Timeseries {
+func getTSBytes() []byte {
 
 	dateTime := strfmt.DateTime(time.Now().UTC())
 
@@ -121,10 +125,32 @@ func getTS() []model.Timeseries {
 		ts2,
 	}
 
-	// o1, _ := json.Marshal(ts1)
-	// o, _ := json.Marshal(tsa)
-	// fmt.Println("o1 - ", string(o1))
-	// fmt.Println("tsa - ", string(o))
+	o, _ := json.Marshal(tsa)
 
-	return tsa
+	mp1 := `--f0Ve5iPP2ySppIcDSR6Bak
+	Content-Type: multipart/related;boundary=penFL6sBQHJJUN3HA4ftqC
+	
+	--penFL6sBQHJJUN3HA4ftqC
+	Content-Type: application/vnd.siemens.mindsphere.meta+json
+	
+	{
+		"type": "item",
+		"version": "1.0",
+		"payload": {
+			"type": "standardTimeSeries",
+			"version": "1.0",
+			"details": {
+				"configurationId": ""
+			}
+		}
+	}
+	--penFL6sBQHJJUN3HA4ftqC
+	Content-Type: application/json`
+
+	mp2 := `--penFL6sBQHJJUN3HA4ftqC--
+	--f0Ve5iPP2ySppIcDSR6Bak--`
+
+	out := []byte(fmt.Sprintf("%s %s %s ", mp1, string(o), mp2))
+	fmt.Println("tsa - ", string(out))
+	return out
 }
