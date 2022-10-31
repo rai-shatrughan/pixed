@@ -47,7 +47,7 @@ func (kv *KV) Put(key, value string) error {
 	} else {
 		kv.logger.Debug("Successfully put to etcd - ", zap.String("key", key), zap.String("value", value))
 		elapsed := time.Since(start)
-		kv.logger.Info("Put to etcd took", zap.Duration("duration", elapsed))
+		kv.logger.Debug("Put to etcd took", zap.Duration("duration", elapsed))
 		return nil
 	}
 }
@@ -64,7 +64,7 @@ func (kv *KV) Get(key string) (string, error) {
 	if getResp.Count >= 1 {
 		kv.logger.Debug("Successfully got from etcd - ", zap.ByteString("key", getResp.Kvs[0].Key), zap.ByteString("value", getResp.Kvs[0].Value))
 		elapsed := time.Since(start)
-		kv.logger.Info("Get from etcd took", zap.Duration("duration", elapsed))
+		kv.logger.Debug("Get from etcd took", zap.Duration("duration", elapsed))
 		return string(getResp.Kvs[0].Value), nil
 	} else {
 		return "{}", err
@@ -83,7 +83,7 @@ func (kv *KV) GetFromKey(key string) (string, error) {
 
 	if getResp.Count >= 1 {
 		elapsed := time.Since(start)
-		kv.logger.Info("Get from etcd took", zap.Duration("duration", elapsed))
+		kv.logger.Debug("Get from etcd took", zap.Duration("duration", elapsed))
 		var rb1 strings.Builder
 		rb1.WriteString("[")
 		kv.logger.Debug("Successfully got values for key - ", zap.String("key", key), zap.Int64("count", getResp.Count))
@@ -112,7 +112,7 @@ func (kv *KV) GetFromKeyWithLimit(key string, limit int64) (string, error) {
 
 	if getResp.Count >= 1 {
 		elapsed := time.Since(start)
-		kv.logger.Info("Get from etcd took", zap.Duration("duration", elapsed))
+		kv.logger.Debug("Get from etcd took", zap.Duration("duration", elapsed))
 		var rb1 strings.Builder
 		rb1.WriteString("[")
 		kv.logger.Debug("Successfully got values for key - ", zap.String("key", key), zap.Int64("count", getResp.Count))

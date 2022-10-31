@@ -122,7 +122,7 @@ func parseKafkaMsg(msgChan <-chan kafka.Message, tskvChan chan<- tskv) {
 				logger.Debug(val)
 				tskvChan <- tskv{key: key, value: val}
 			}
-			logger.Info("Time elapsed for parser",
+			logger.Debug("Time elapsed for parser",
 				zap.String("duration", time.Since(start).String()),
 			)
 		}

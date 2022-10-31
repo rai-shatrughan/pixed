@@ -78,7 +78,7 @@ func (kf *KafkaReaders) Read(reader *kafka.Reader) (kafka.Message, error) {
 	}
 	elapsed = time.Since(start)
 
-	kf.logger.Info("Kafka Read", zap.Duration("duration", elapsed))
+	kf.logger.Debug("Kafka Read", zap.Duration("duration", elapsed))
 
 	return msg, nil
 }
@@ -94,7 +94,7 @@ func (kf *KafkaWriter) Write(key, value []byte) error {
 		},
 	)
 	elapsed := time.Since(start)
-	kf.logger.Info("Kafka Write", zap.Duration("duration", elapsed))
+	kf.logger.Debug("Kafka Write", zap.Duration("duration", elapsed))
 
 	if err != nil {
 		return err
@@ -115,7 +115,7 @@ func (kf *KafkaWriter) BatchWrite(key, val [][]byte) error {
 
 	err := kf.writer.WriteMessages(context.Background(), msgs...)
 	elapsed := time.Since(start)
-	kf.logger.Info("Kafka Write", zap.Duration("duration", elapsed))
+	kf.logger.Debug("Kafka Write", zap.Duration("duration", elapsed))
 
 	if err != nil {
 		kf.logger.Error("Error Writing msg to Kafka ", zap.Error(err))
