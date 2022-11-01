@@ -39,12 +39,12 @@ services:
       - "2888"
       - "3888"
     volumes:
-      - /data/zookeeper:/bitnami
+      - /data/kafka_zk:/bitnami
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     networks:
       sr_cluster_network:
-        ipv4_address: ${ZOOKEEPER_IP}
+        ipv4_address: ${KAFKA_ZK_IP}
 
   kafka:
     image: docker.io/bitnami/kafka:3.1
@@ -68,21 +68,40 @@ services:
     depends_on:
       - kafka_zk
 
-  etcd1:
-    image: "bitnami/etcd:3.5.4"
-    container_name: etcd1
-    restart: always
-    environment:
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://${ETCD1_IP}:2379
+  hbase:
+    build: ./hbase
+    image: hbase
+    hostname: hbase
+    container_name: hbase
     volumes:
-      - /data/etcd1:/bitnami/etcd
-    expose:
-      - 2379
-      - 2380
+      - /data/hbase:/tmp
+      - /data/hbase/:/logs
+    command: >
+      bash -c "bin/start-hbase.sh && tail -f /logs/hbase--master-hbase.log"
+    ports:
+      - "16010:16010"
+      - "16020:16020"
+      - "16000:16000"
     networks:
       sr_cluster_network:
-        ipv4_address: ${ETCD1_IP}
+        ipv4_address: ${HBASE_IP}
+
+  hbase_zk:
+    image: docker.io/bitnami/zookeeper:3.8
+    container_name: hbase_zk
+    hostname: hbase_zk
+    restart: always
+    expose:
+      - "2181"
+      - "2888"
+      - "3888"
+    volumes:
+      - /data/hbase_zk:/bitnami
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      sr_cluster_network:
+        ipv4_address: ${HBASE_ZK_IP}
 
   jaeger:
     image: "jaegertracing/all-in-one:1.38"

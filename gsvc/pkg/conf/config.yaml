@@ -11,14 +11,17 @@ kafka:
 etcd:
   hosts:
     - "172.18.0.71:2379"
-    
-http:
-  address: "0.0.0.0:8000"
-basepath:
-  stream: "/api/v1/stream/"
-  timeseries: "/api/iottimeseries/v3/timeseries/"
-  exchange: "/api/mindconnect/v3/exchange/"
 
 svc:
   stream:
     dir: "/data/asset"
+
+http:
+  address: "0.0.0.0:8000"
+  
+basepath:
+  stream: "/api/v1/stream/"
+  timeseries: "/api/iottimeseries/v3/timeseries/"
+  exchange: "/api/mindconnect/v3/exchange/"
+  agm: "/api/agentmanagement/v3/agents/"
+

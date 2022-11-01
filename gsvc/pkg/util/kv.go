@@ -45,7 +45,7 @@ func (kv *KV) Put(key, value string) error {
 		kv.logger.Error("Error writing KV store ", zap.Error(err))
 		return err
 	} else {
-		kv.logger.Debug("Successfully put to etcd - ", zap.String("key", key), zap.String("value", value))
+		kv.logger.Info("Successfully put to etcd - ", zap.String("key", key), zap.String("value", value))
 		elapsed := time.Since(start)
 		kv.logger.Debug("Put to etcd took", zap.Duration("duration", elapsed))
 		return nil

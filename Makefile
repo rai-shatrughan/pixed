@@ -15,7 +15,7 @@ down:
 dirs:
 	base=/data; \
 	sudo rm -rf $$base; \
-    for dir in kafka zookeeper sql etcd1 prometheus grafana; do \
+    for dir in sql kafka kafka_zk hbase hbase_zk prometheus grafana; do \
 		wd=$$base/$$dir; \
         echo $$wd; \
 		sudo mkdir -p $$wd; \
