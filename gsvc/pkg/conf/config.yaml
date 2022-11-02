@@ -8,9 +8,8 @@ kafka:
   # kafka.LastOffset = -1
   # kafka.FirstOffset = -2
   startOffSet: -1 
-etcd:
-  hosts:
-    - "172.18.0.71:2379"
+hbase:
+  zookeeper: "172.18.0.131"
 
 svc:
   stream:

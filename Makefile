@@ -54,7 +54,7 @@ clean:
 
 test:
 	cd gsvc; \
-	go test test/exch_test.go -args -host gsvc
+	go run test/main.go run constant exchPostScenario -c 2 -r 1/s -d 10s
 
 testr:
 	cd gsvc; \
@@ -63,10 +63,6 @@ testr:
 perf:
 	cd gsvc; \
 	bash test/runGowrk.sh
-
-bench:
-	cd gsvc; \
-	go test test/exch_test.go -bench=. -benchtime=10s -args -host gsvc
 
 gsvc:
 	cd gsvc; \

@@ -3,16 +3,18 @@ package main
 import (
 	// go modules
 	"context"
-	"fmt"
+	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	// git modules
 	"github.com/segmentio/kafka-go"
 
 	// websvc modules
+	md "gsvc/pkg/model"
 	"gsvc/pkg/util"
 
 	"github.com/tsuna/gohbase"
@@ -20,179 +22,121 @@ import (
 )
 
 var (
-	etc       = util.KV{}
-	logger    = util.Logger{}
-	client    gohbase.Client
-	hbaseHost = "172.18.0.131"
+	logger     util.Logger
+	conf       util.Config
+	client     gohbase.Client
+	hbaseHost  string
+	hbaseTable string
 )
 
 func init() {
-	conf := util.Config{}
+
 	conf.New()
 
-	logger.New()
-	etc.New(&conf, &logger)
-	client = gohbase.NewClient(hbaseHost)
+	hbaseHost = conf.GetString("hbase.zookeeper")
+	hbaseTable = conf.GetString("kafka.topic")
 
+	logger.New()
+	client = gohbase.NewClient(hbaseHost)
 }
 
 func main() {
-	// createTable()
+	createTable()
 	readMessage()
 }
 
 func createTable() {
-	testTableName := "ts-table"
 
-	var cFamilies = map[string]map[string]string{
-		"cf":  nil,
-		"cf2": nil,
-	}
+	var created bool
+	var retryCount = 0
 
-	ac := gohbase.NewAdminClient(hbaseHost)
-	crt := hrpc.NewCreateTable(context.Background(), []byte(testTableName), cFamilies)
+	for !created && retryCount < 10 {
+		time.Sleep(3 * time.Second)
+		var cFamilies = map[string]map[string]string{
+			"cf": nil,
+		}
 
-	if err := ac.CreateTable(crt); err != nil {
-		fmt.Errorf("CreateTable returned an error: %v", err)
+		ac := gohbase.NewAdminClient(hbaseHost)
+		crt := hrpc.NewCreateTable(context.Background(), []byte(hbaseTable), cFamilies)
+
+		if err := ac.CreateTable(crt); err != nil {
+			logger.Sugar().Error("createTable returned an error: %v", err)
+			retryCount++
+			logger.Sugar().Error("retry count : ", retryCount)
+		} else {
+			logger.Sugar().Info("table created in attempt : ", retryCount)
+			created = true
+		}
+
 	}
 }
 
 func readMessage() {
+	done := make(chan bool)
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{"172.18.0.41:9092"},
-		GroupID:  "consumer-group-id",
-		Topic:    "ts",
-		MinBytes: 0,    // 10KB
+		Brokers:  conf.GetStringSlice("kafka.brokers"),
+		GroupID:  conf.GetString("kafka.groupId"),
+		Topic:    conf.GetString("kafka.topic"),
+		MinBytes: 0,
 		MaxBytes: 10e6, // 10MB
 	})
+	setupCloseReaderHandler(r)
 
+	for i := 0; i < 2000; i++ {
+		go consume(r)
+	}
+	done <- true
+}
+
+func consume(r *kafka.Reader) {
 	for {
 		m, err := r.ReadMessage(context.TODO())
 		if err != nil {
 			log.Fatal("Error reading:", err)
 		}
 		// fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
-		fmt.Printf("message at topic/partition/offset %v/%v/%v: \n", m.Topic, m.Partition, m.Offset)
-
-		// Values maps a ColumnFamily -> Qualifiers -> Values.
-		values := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte{0}}}
-		putRequest, err := hrpc.NewPutStr(context.Background(), "ts-table", "key", values)
-		rsp, err := client.Put(putRequest)
-
-		fmt.Println("HELLO", rsp)
-		if err != nil {
-			fmt.Printf("Error ETC - %s", err)
-		}
-		time.Sleep(10000)
+		logger.Sugar().Infof("message at topic/partition/offset %v/%v/%v", m.Topic, m.Partition, m.Offset)
+		parseKafkaMsg(m)
 	}
-
 }
 
-// func groupConsumer() {
-// 	done := make(chan bool)
-// 	for i := 0; i < kafkaReaderCount; i++ {
-// 		go readKafkaMsg(kf.Readers[i], kafkaMsgChan)
-// 	}
+func writeHbase(key string, value string) {
+	logger.Sugar().Info("Writing : ", key)
+	values := map[string]map[string][]byte{"cf": {"a": []byte(value)}}
+	putRequest, _ := hrpc.NewPutStr(context.Background(), hbaseTable, key, values)
+	_, err := client.Put(putRequest)
 
-// 	for i := 0; i < tsParserCount; i++ {
-// 		go parseKafkaMsg(kafkaMsgChan, tskvChan)
-// 	}
+	// logger.Sugar().Info("Insert status : ", rsp)
+	if err != nil {
+		logger.Sugar().Error("error in writing to hbase - ", err)
+	}
+}
 
-// 	for i := 0; i < kvWriterCount; i++ {
-// 		go writeKV(tskvChan, kvCounterChan)
-// 	}
+func parseKafkaMsg(msg kafka.Message) {
+	tsa := md.TimeseriesArray{}
+	json.Unmarshal(msg.Value, &tsa)
+	for i := range tsa {
+		// date := strings.Split(tsa[i].Timestamp.String(), "T")
 
-// 	go msgCounter(kvCounterChan)
+		key := string(msg.Key) + "_" + tsa[i].Timestamp.String()
+		logger.Debug(key)
 
-// 	quitHandler()
-// 	<-done
-// }
+		ts, _ := json.Marshal(tsa[i])
+		val := string(ts)
+		writeHbase(key, val)
+	}
+}
 
-// func msgCounter(kvCounterChan <-chan int8) {
-// 	var kvCounter int64
-// 	for {
-// 		select {
-// 		case <-ctx.Done():
-// 			logger.Info("stopping counter")
-// 			return
-// 		case <-kvCounterChan:
-// 			kvCounter++
-// 			logger.Info("Total messages written to etcd", zap.Int64("count", kvCounter))
-// 		}
-// 	}
-
-// }
-
-// func writeKV(tskvChan <-chan tskv, kvCounterChan chan<- int8) {
-// 	for {
-// 		select {
-// 		case <-ctx.Done():
-// 			logger.Info("stopping parser")
-// 			return
-// 		default:
-// 			kv := <-tskvChan
-// 			etc.Put(kv.key, kv.value)
-// 			kvCounterChan <- 1
-// 		}
-// 	}
-
-// }
-
-// func parseKafkaMsg(msgChan <-chan kafka.Message, tskvChan chan<- tskv) {
-// 	for {
-// 		select {
-// 		case <-ctx.Done():
-// 			logger.Info("stopping parser")
-// 			return
-// 		default:
-// 			start := time.Now()
-// 			msg := <-msgChan
-// 			tsa := md.TimeseriesArray{}
-// 			json.Unmarshal(msg.Value, &tsa)
-// 			for i := range tsa {
-// 				date := strings.Split(tsa[i].Timestamp.String(), "T")
-
-// 				key := "/" + string(msg.Key) + "/" + date[0] + "/" + tsa[i].Timestamp.String()
-// 				logger.Debug(key)
-
-// 				ts, _ := json.Marshal(tsa[i])
-// 				val := string(ts)
-// 				logger.Debug(val)
-// 				tskvChan <- tskv{key: key, value: val}
-// 			}
-// 			logger.Debug("Time elapsed for parser",
-// 				zap.String("duration", time.Since(start).String()),
-// 			)
-// 		}
-// 	}
-// }
-
-// func readKafkaMsg(reader *kafka.Reader, kafkaMsgChan chan<- kafka.Message) {
-// 	for {
-// 		select {
-// 		case <-ctx.Done():
-// 			logger.Info("stopping reader")
-// 			return
-// 		default:
-// 			msg, err := kf.Read(reader)
-// 			if err != nil {
-// 				logger.Error(err.Error())
-// 			} else {
-// 				kafkaMsgChan <- msg
-// 			}
-// 		}
-
-// 	}
-// }
-
-func quitHandler(r *kafka.Reader) {
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt)
+func setupCloseReaderHandler(r *kafka.Reader) {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		<-sig
-		logger.Info("\r- Ctrl+C pressed - stopping writer now")
+		<-c
+		logger.Info("\r- Ctrl+C pressed in Terminal")
+		logger.Info("Closing reader...")
 		if err := r.Close(); err != nil {
-			log.Fatal("failed to close reader:", err)
+			logger.Fatal("Failed to close reader...")
 		}
+		os.Exit(0)
 	}()
 }

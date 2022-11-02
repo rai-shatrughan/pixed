@@ -1,17 +1,15 @@
-package test
+package main
 
 import (
-	// "encoding/json"
-	// "fmt"
-
 	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
-	"testing"
+	"strings"
 	"time"
 
-	"github.com/gavv/httpexpect/v2"
+	"github.com/form3tech-oss/f1/v2/pkg/f1"
+	"github.com/form3tech-oss/f1/v2/pkg/f1/testing"
 	"github.com/go-openapi/strfmt"
 
 	model "gsvc/pkg/model"
@@ -23,71 +21,50 @@ var (
 	host                = flag.String("host", "gsvc", "Name of service to test")
 )
 
+func main() {
+	f := f1.New()
+	f.Add("exchPostScenario", postTimeseries)
+	f.Execute()
+}
+
 func hostCheck() {
 	if *host == "gsvc" {
 		tsPostURL = "http://172.18.0.21:8000/api/mindconnect/v3/exchange/"
 		tsGetURL = "http://172.18.0.21:8000/api/iottimeseries/v3/timeseries/"
-		// fmt.Println(*host)
 	} else {
-		tsPostURL = "http://172.18.0.22:9000/api/v1/exchange"
+		tsPostURL = "http://172.18.0.22:9000/api/v1/exchange/"
 		tsGetURL = "http://172.18.0.21:9000/api/iottimeseries/v3/timeseries/"
-		// fmt.Println(*host)
 	}
 }
 
-func TestPostTimeseries(t *testing.T) {
+func postTimeseries(t *testing.T) testing.RunFn {
 	hostCheck()
 	tsBytes := getTSBytes()
-	e := httpexpect.New(t, tsPostURL)
-	obj := e.POST(baseEntity).
-		WithHeader("X-API-Key", "sr12345").
-		WithHeader("Content-Type", "application/json").
-		WithBytes(tsBytes).
-		Expect().
-		Status(http.StatusOK).
-		JSON().
-		Object()
 
-	obj.Value("TimeseriesUpload").Equal("Ok")
-
-}
-
-func TestGetTimeSeries(t *testing.T) {
-	hostCheck()
-	e := httpexpect.New(t, tsGetURL)
-	obj := e.GET(baseEntity).
-		WithHeader("X-API-Key", "sr12345").
-		WithQuery("duration", "1m").
-		Expect().
-		Status(http.StatusOK).
-		JSON().
-		Array()
-
-	obj.First().Object().Value("values")
-}
-
-func BenchmarkPostTimeSeries(b *testing.B) {
-	hostCheck()
-	e := httpexpect.New(b, tsPostURL)
-
-	for n := 0; n < b.N; n++ {
-		// myid := uuid.New()
-		myid := baseEntity
-		tsBytes := getTSBytes()
-		obj := e.POST(myid).
-			WithHeader("X-API-Key", "sr12345").
-			WithHeader("Content-Type", "application/json").
-			WithBytes(tsBytes).
-			Expect().
-			Status(http.StatusOK).
-			JSON().
-			Object()
-
-		obj.Value("TimeseriesUpload").Equal("Ok")
+	runFn := func(t *testing.T) {
+		res, err := http.Post(tsPostURL+baseEntity, "application/json", strings.NewReader(tsBytes))
+		t.Require().NoError(err)
+		t.Require().Equal(http.StatusOK, res.StatusCode)
 	}
+
+	return runFn
 }
 
-func getTSBytes() []byte {
+// func TestGetTimeSeries(t *testing.T) {
+// 	hostCheck()
+// 	e := httpexpect.New(t, tsGetURL)
+// 	obj := e.GET(baseEntity).
+// 		WithHeader("X-API-Key", "sr12345").
+// 		WithQuery("duration", "1m").
+// 		Expect().
+// 		Status(http.StatusOK).
+// 		JSON().
+// 		Array()
+
+// 	obj.First().Object().Value("values")
+// }
+
+func getTSBytes() string {
 
 	dateTime := strfmt.DateTime(time.Now().UTC())
 
@@ -150,7 +127,8 @@ func getTSBytes() []byte {
 	mp2 := `--penFL6sBQHJJUN3HA4ftqC--
 	--f0Ve5iPP2ySppIcDSR6Bak--`
 
-	out := []byte(fmt.Sprintf("%s %s %s ", mp1, string(o), mp2))
-	fmt.Println("tsa - ", string(out))
+	// out := []byte(fmt.Sprintf("%s %s %s ", mp1, string(o), mp2))
+	// fmt.Println("tsa - ", string(out))
+	out := fmt.Sprintf("%s %s %s ", mp1, string(o), mp2)
 	return out
 }

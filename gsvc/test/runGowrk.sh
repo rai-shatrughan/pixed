@@ -10,17 +10,22 @@ putTS(){
     echo "---put TS---"
     echo ""
 
-    start=`date`
-    echo "Start Time - " $start
+    startUTC=`date -u`
+    startIST=`date`
+    echo "Start Time IST - " $startIST
+    echo "Start Time UTC - " $startUTC
 
-    go-wrk -c 2000 -d 3600 -T 30000 -M POST \
+    go-wrk -c 8000 -d 36000 -T 30000 -M POST \
         -H "X-API-Key: sr12345" \
         -H "Content-Type: application/json" \
         -body @test/json/ex.json \
         http://${HOST}/api/mindconnect/v3/exchange/6fdae6af-226d-48bd-8b61-699758137eb3
 
-    end=`date`
-    echo "End Time - " $end
+    
+    endUTC=`date -u`
+    endIST=`date`
+    echo "End Time IST - " $endIST
+    echo "End Time UTC - " $endUTC
 }
 
 getTS(){
