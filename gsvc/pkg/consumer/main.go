@@ -4,10 +4,10 @@ import (
 	// go modules
 	"context"
 	"encoding/json"
-	"log"
 	"os"
 	"os/signal"
-	"syscall"
+	"strings"
+	"sync"
 	"time"
 
 	// git modules
@@ -27,6 +27,7 @@ var (
 	client     gohbase.Client
 	hbaseHost  string
 	hbaseTable string
+	reader     *kafka.Reader
 )
 
 func init() {
@@ -38,11 +39,27 @@ func init() {
 
 	logger.New()
 	client = gohbase.NewClient(hbaseHost)
+
+	reader = kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  conf.GetStringSlice("kafka.brokers"),
+		GroupID:  conf.GetString("kafka.groupId"),
+		Topic:    conf.GetString("kafka.topic"),
+		MinBytes: 0,
+		MaxBytes: 10e6, // 10MB
+	})
+
 }
 
 func main() {
+	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
+	quitHandler(cancel)
 	createTable()
-	readMessage()
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go consume(&wg, ctx, i)
+	}
+	wg.Wait()
 }
 
 func createTable() {
@@ -60,6 +77,11 @@ func createTable() {
 		crt := hrpc.NewCreateTable(context.Background(), []byte(hbaseTable), cFamilies)
 
 		if err := ac.CreateTable(crt); err != nil {
+			if strings.Contains(err.Error(), "TableExists") {
+				created = true
+				logger.Sugar().Info("table exists")
+				break
+			}
 			logger.Sugar().Error("createTable returned an error: %v", err)
 			retryCount++
 			logger.Sugar().Error("retry count : ", retryCount)
@@ -71,72 +93,61 @@ func createTable() {
 	}
 }
 
-func readMessage() {
-	done := make(chan bool)
-	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  conf.GetStringSlice("kafka.brokers"),
-		GroupID:  conf.GetString("kafka.groupId"),
-		Topic:    conf.GetString("kafka.topic"),
-		MinBytes: 0,
-		MaxBytes: 10e6, // 10MB
-	})
-	setupCloseReaderHandler(r)
-
-	for i := 0; i < 2000; i++ {
-		go consume(r)
-	}
-	done <- true
-}
-
-func consume(r *kafka.Reader) {
+func consume(wg *sync.WaitGroup, ctx context.Context, num int) {
 	for {
-		m, err := r.ReadMessage(context.TODO())
-		if err != nil {
-			log.Fatal("Error reading:", err)
+		select {
+		case <-ctx.Done():
+			logger.Sugar().Info("exiting consumer - ", num)
+			wg.Done()
+			return
+		default:
+			logger.Sugar().Infof("consumer - %v", num)
+			ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*10)
+			defer cancel()
+			m, err := reader.ReadMessage(ctxTimeout)
+			if err != nil {
+				if strings.Contains(err.Error(), "context deadline exceeded") {
+					logger.Sugar().Infof("no new kafka msg in last 10 seconds")
+					break
+				}
+				logger.Sugar().Infof("error reading kafka:", err)
+				break
+			}
+			// fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+			logger.Sugar().Infof("consumer - %v : message at topic/partition/offset %v/%v/%v", num, m.Topic, m.Partition, m.Offset)
+
+			tsa := md.TimeseriesArray{}
+			json.Unmarshal(m.Value, &tsa)
+			for i := range tsa {
+				// date := strings.Split(tsa[i].Timestamp.String(), "T")
+
+				key := string(m.Key) + "_" + tsa[i].Timestamp.String()
+				logger.Debug(key)
+
+				ts, _ := json.Marshal(tsa[i])
+				value := string(ts)
+
+				// logger.Sugar().Info("writing : ", key)
+				values := map[string]map[string][]byte{"cf": {"a": []byte(value)}}
+				putRequest, _ := hrpc.NewPutStr(context.Background(), hbaseTable, key, values)
+				_, err := client.Put(putRequest)
+
+				// logger.Sugar().Info("Insert status : ", rsp)
+				if err != nil {
+					logger.Sugar().Error("error in writing to hbase - ", err)
+				}
+			}
 		}
-		// fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
-		logger.Sugar().Infof("message at topic/partition/offset %v/%v/%v", m.Topic, m.Partition, m.Offset)
-		parseKafkaMsg(m)
 	}
+
 }
 
-func writeHbase(key string, value string) {
-	logger.Sugar().Info("Writing : ", key)
-	values := map[string]map[string][]byte{"cf": {"a": []byte(value)}}
-	putRequest, _ := hrpc.NewPutStr(context.Background(), hbaseTable, key, values)
-	_, err := client.Put(putRequest)
-
-	// logger.Sugar().Info("Insert status : ", rsp)
-	if err != nil {
-		logger.Sugar().Error("error in writing to hbase - ", err)
-	}
-}
-
-func parseKafkaMsg(msg kafka.Message) {
-	tsa := md.TimeseriesArray{}
-	json.Unmarshal(msg.Value, &tsa)
-	for i := range tsa {
-		// date := strings.Split(tsa[i].Timestamp.String(), "T")
-
-		key := string(msg.Key) + "_" + tsa[i].Timestamp.String()
-		logger.Debug(key)
-
-		ts, _ := json.Marshal(tsa[i])
-		val := string(ts)
-		writeHbase(key, val)
-	}
-}
-
-func setupCloseReaderHandler(r *kafka.Reader) {
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+func quitHandler(cancel context.CancelFunc) {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		logger.Info("\r- Ctrl+C pressed in Terminal")
-		logger.Info("Closing reader...")
-		if err := r.Close(); err != nil {
-			logger.Fatal("Failed to close reader...")
-		}
-		os.Exit(0)
+		logger.Info("\r- Ctrl+C pressed - stopping consumer now")
+		cancel()
 	}()
 }

@@ -15,7 +15,7 @@ putTS(){
     echo "Start Time IST - " $startIST
     echo "Start Time UTC - " $startUTC
 
-    go-wrk -c 8000 -d 36000 -T 30000 -M POST \
+    go-wrk -c 8000 -d 3600 -T 30000 -M POST \
         -H "X-API-Key: sr12345" \
         -H "Content-Type: application/json" \
         -body @test/json/ex.json \
