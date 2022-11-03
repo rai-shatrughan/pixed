@@ -73,6 +73,7 @@ services:
     image: hbase
     hostname: hbase
     container_name: hbase
+    restart: always
     volumes:
       - /data/hbase:/tmp
       - /data/hbase/:/logs
