@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	// git modules
@@ -144,7 +145,7 @@ func consume(wg *sync.WaitGroup, ctx context.Context, num int) {
 
 func quitHandler(cancel context.CancelFunc) {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGINT, os.Interrupt)
 	go func() {
 		<-c
 		logger.Info("\r- Ctrl+C pressed - stopping consumer now")
