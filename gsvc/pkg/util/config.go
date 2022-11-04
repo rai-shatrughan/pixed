@@ -19,6 +19,7 @@ func (c *Config) New() {
 	c.AddConfigPath("/conf")      // call multiple times to add many search paths
 	c.AddConfigPath("../conf/")
 	c.AddConfigPath("./pkg/conf/")
+	c.AddConfigPath("../pkg/conf/")
 	c.SetConfigName("config")
 	c.SetConfigType("yaml")
 

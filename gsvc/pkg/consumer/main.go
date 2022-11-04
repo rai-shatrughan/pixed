@@ -56,7 +56,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	quitHandler(cancel)
 	createTable()
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 2; i++ {
 		wg.Add(1)
 		go consume(&wg, ctx, i)
 	}
@@ -128,12 +128,12 @@ func consume(wg *sync.WaitGroup, ctx context.Context, num int) {
 				ts, _ := json.Marshal(tsa[i])
 				value := string(ts)
 
-				// logger.Sugar().Info("writing : ", key)
+				logger.Sugar().Info("writing : ", key)
 				values := map[string]map[string][]byte{"cf": {"a": []byte(value)}}
 				putRequest, _ := hrpc.NewPutStr(context.Background(), hbaseTable, key, values)
-				_, err := client.Put(putRequest)
+				rsp, err := client.Put(putRequest)
 
-				// logger.Sugar().Info("Insert status : ", rsp)
+				logger.Sugar().Info("Insert status : ", rsp)
 				if err != nil {
 					logger.Sugar().Error("error in writing to hbase - ", err)
 				}

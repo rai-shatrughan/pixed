@@ -15,6 +15,7 @@ type Logger struct {
 func (l *Logger) New() {
 	// this or zap.NewProduction()
 	config := zap.NewProductionConfig()
+	// config := zap.NewDevelopmentConfig()
 	config.Level.Enabled(zap.DebugLevel)
 	config.EncoderConfig.TimeKey = "timestamp"
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder

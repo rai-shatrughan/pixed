@@ -52,9 +52,13 @@ clean:
 
 #docker end
 
-ing:
+testv:
 	cd gsvc; \
 	go test -v test/ingest_test.go -args -host gsvc
+
+test:
+	cd gsvc; \
+	go test test/ingest_test.go -args -host gsvc
 
 testr:
 	cd gsvc; \

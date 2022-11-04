@@ -108,9 +108,7 @@ func GetTimeseries(kv *util.KV, logger *util.Logger) http.Handler {
 			return
 		}
 
-		res, err := kv.GetKeyWithLimit(assetId, 1000)
-		// res, err := kv.GetKeyDefLimit(assetId)
-		// res, err := kv.Get(assetId + "_" + "2022-10-01T08:30:03.780Z")
+		res, err := kv.Get(assetId)
 		if err != nil {
 			mware.ResponseWriter(w, processErrMsg, http.StatusInternalServerError)
 			logger.Error(err.Error())

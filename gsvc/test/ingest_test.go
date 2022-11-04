@@ -21,12 +21,17 @@ var (
 	tsPostURL, tsGetURL string
 	host                = flag.String("host", "gsvc", "Name of service to test")
 	agents              = data.Agents
+	kv                  util.KV
 	logger              util.Logger
+	conf                util.Config
 )
 
 func init() {
-	logger.New()
 	hostCheck()
+	logger.New()
+	conf.New()
+
+	kv.New(&conf, &logger)
 }
 
 func hostCheck() {
@@ -40,8 +45,9 @@ func hostCheck() {
 }
 
 func TestPostTimeseries(t *testing.T) {
+	tsBytes := getTSBytes()
 	for _, agent := range agents {
-		tsBytes := getTSBytes()
+		// time.Sleep(time.Millisecond * 500)
 		logger.Sugar().Infof("agent : %s", agent)
 		res, err := http.Post(tsPostURL+agent, "application/json", strings.NewReader(tsBytes))
 		if err != nil && res.StatusCode != 200 {
@@ -62,9 +68,17 @@ func TestGetTimeseries(t *testing.T) {
 	}
 }
 
+// func TestGetKV(t *testing.T) {
+// 	for _, agent := range agents {
+// 		res, _ := kv.Get(agent + "_")
+// 		logger.Sugar().Infof("agent - %s , response : %s", agent, res)
+// 	}
+// }
+
 func getTSBytes() string {
 
-	dateTime := strfmt.DateTime(time.Now().UTC())
+	dt1 := strfmt.DateTime(time.Now().UTC())
+	dt2 := strfmt.DateTime(time.Now().Add(-time.Second * 10).UTC())
 
 	dp1 := "dp1"
 	dp2 := "dp2"
@@ -86,12 +100,12 @@ func getTSBytes() string {
 	}
 
 	ts1 := model.Timeseries{
-		Timestamp: &dateTime,
+		Timestamp: &dt1,
 		Values:    []model.TimeseriesValue{val1, val2},
 	}
 
 	ts2 := model.Timeseries{
-		Timestamp: &dateTime,
+		Timestamp: &dt2,
 		Values:    []model.TimeseriesValue{val1, val2},
 	}
 
