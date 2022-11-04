@@ -1,30 +1,32 @@
-package main
+package test
 
 import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
+	"testing"
 	"time"
 
-	"github.com/form3tech-oss/f1/v2/pkg/f1"
-	"github.com/form3tech-oss/f1/v2/pkg/f1/testing"
 	"github.com/go-openapi/strfmt"
 
 	model "gsvc/pkg/model"
+	"gsvc/pkg/util"
+	"gsvc/test/data"
 )
 
 var (
-	baseEntity          = "6fdae6af-226d-48bd-8b61-699758137eb3"
 	tsPostURL, tsGetURL string
 	host                = flag.String("host", "gsvc", "Name of service to test")
+	agents              = data.Agents
+	logger              util.Logger
 )
 
-func main() {
-	f := f1.New()
-	f.Add("exchPostScenario", postTimeseries)
-	f.Execute()
+func init() {
+	logger.New()
+	hostCheck()
 }
 
 func hostCheck() {
@@ -37,32 +39,28 @@ func hostCheck() {
 	}
 }
 
-func postTimeseries(t *testing.T) testing.RunFn {
-	hostCheck()
-	tsBytes := getTSBytes()
-
-	runFn := func(t *testing.T) {
-		res, err := http.Post(tsPostURL+baseEntity, "application/json", strings.NewReader(tsBytes))
-		t.Require().NoError(err)
-		t.Require().Equal(http.StatusOK, res.StatusCode)
+func TestPostTimeseries(t *testing.T) {
+	for _, agent := range agents {
+		tsBytes := getTSBytes()
+		logger.Sugar().Infof("agent : %s", agent)
+		res, err := http.Post(tsPostURL+agent, "application/json", strings.NewReader(tsBytes))
+		if err != nil && res.StatusCode != 200 {
+			t.Failed()
+		}
 	}
-
-	return runFn
 }
 
-// func TestGetTimeSeries(t *testing.T) {
-// 	hostCheck()
-// 	e := httpexpect.New(t, tsGetURL)
-// 	obj := e.GET(baseEntity).
-// 		WithHeader("X-API-Key", "sr12345").
-// 		WithQuery("duration", "1m").
-// 		Expect().
-// 		Status(http.StatusOK).
-// 		JSON().
-// 		Array()
-
-// 	obj.First().Object().Value("values")
-// }
+func TestGetTimeseries(t *testing.T) {
+	for _, agent := range agents {
+		logger.Sugar().Infof("agent : %s", agent)
+		res, err := http.Get(tsGetURL + agent)
+		if err != nil && res.StatusCode != 200 {
+			t.Failed()
+		}
+		resp_body, _ := io.ReadAll(res.Body)
+		logger.Sugar().Infof("agent - %s , response : %s", agent, resp_body)
+	}
+}
 
 func getTSBytes() string {
 

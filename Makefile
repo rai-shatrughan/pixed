@@ -52,9 +52,9 @@ clean:
 
 #docker end
 
-test:
+ing:
 	cd gsvc; \
-	go run test/main.go run constant exchPostScenario -c 2 -r 1/s -d 10s
+	go test -v test/ingest_test.go -args -host gsvc
 
 testr:
 	cd gsvc; \
