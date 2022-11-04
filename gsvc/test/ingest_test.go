@@ -76,14 +76,15 @@ func TestGetTimeseries(t *testing.T) {
 // }
 
 func getTSBytes() string {
-
-	dt1 := strfmt.DateTime(time.Now().UTC())
-	dt2 := strfmt.DateTime(time.Now().Add(-time.Second * 10).UTC())
+	nw := time.Now().UTC()
+	bf := nw.Add(-time.Second * 10)
+	dt1 := strfmt.DateTime(nw)
+	dt2 := strfmt.DateTime(bf)
 
 	dp1 := "dp1"
 	dp2 := "dp2"
-	v1 := 12.0
-	v2 := 100.0
+	v1 := float64(nw.Second())
+	v2 := float64(bf.Second())
 	q1 := 0.0
 	q2 := 1.0
 
