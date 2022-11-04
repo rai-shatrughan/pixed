@@ -36,60 +36,39 @@ func (kv *KV) Put(table, key, value string) error {
 }
 
 // Get fetches data from KV store
-// func (kv *KV) Get(key string) (string, error) {
-// 	start := time.Now()
-// 	getResp, err := kv.cli.Get(context.TODO(), key)
-// 	if err != nil {
-// 		kv.logger.Error("Error Reading KV store ", zap.Error(err))
-// 		return "{}", err
-// 	}
+func (kv *KV) Get(key string) (string, error) {
+	var rb1 strings.Builder
+	rb1.WriteString("[")
+	hGet, err := hrpc.NewGetStr(context.Background(), kv.table, key)
+	if err != nil {
+		kv.logger.Sugar().Errorf("error getRequest : %s ", err)
+	}
+	result, err := kv.cli.Get(hGet)
+	if err != nil {
+		kv.logger.Sugar().Errorf("error querying : %s - %s - %s", kv.table, key, err)
+		return "{}", nil
+	}
 
-// 	if getResp.Count >= 1 {
-// 		kv.logger.Debug("Successfully got from etcd - ", zap.ByteString("key", getResp.Kvs[0].Key), zap.ByteString("value", getResp.Kvs[0].Value))
-// 		elapsed := time.Since(start)
-// 		kv.logger.Debug("Get from etcd took", zap.Duration("duration", elapsed))
-// 		return string(getResp.Kvs[0].Value), nil
-// 	} else {
-// 		return "{}", err
-// 	}
+	if result != nil {
+		for _, v := range result.Cells {
+			rb1.WriteString(string(v.Value))
+			rb1.WriteString(",")
+			kv.logger.Sugar().Infof("response : %s ", v.String())
+		}
+	}
 
-// }
+	rb2 := strings.TrimSuffix(rb1.String(), ",")
+	rb2 = rb2 + "]"
+	kv.logger.Sugar().Infof("final response : %s ", rb2)
+	return rb2, nil
+}
 
 // // GetFromKey fetches data after a time range
-// func (kv *KV) GetFromKey(key string) (string, error) {
-// 	start := time.Now()
-// 	getResp, err := kv.cli.Get(context.TODO(), key, clientv3.WithFromKey(), clientv3.WithLimit(0))
-// 	if err != nil {
-// 		kv.logger.Error("Error Reading KV store ", zap.Error(err))
-// 		return "{}", err
-// 	}
-
-// 	if getResp.Count >= 1 {
-// 		elapsed := time.Since(start)
-// 		kv.logger.Debug("Get from etcd took", zap.Duration("duration", elapsed))
-// 		var rb1 strings.Builder
-// 		rb1.WriteString("[")
-// 		kv.logger.Debug("Successfully got values for key - ", zap.String("key", key), zap.Int64("count", getResp.Count))
-// 		for _, ev := range getResp.Kvs {
-// 			rb1.WriteString(string(ev.Value))
-// 			rb1.WriteString(",")
-// 			kv.logger.Debug("Successfully got value for key - ", zap.ByteString("key", ev.Key), zap.ByteString("value", ev.Value))
-// 		}
-// 		rb2 := strings.TrimSuffix(rb1.String(), ",")
-// 		rb2 = rb2 + "]"
-// 		return rb2, nil
-// 	} else {
-// 		kv.logger.Info("No Value found for key - ", zap.String("key", key))
-// 		return "{}", nil
-// 	}
-// }
-
-// GetFromKeyWithLimit fetches data after a time range with limit
-func (kv *KV) GetFromKeyWithLimit(key string, limit int64) (string, error) {
+func (kv *KV) GetKeyDefLimit(key string) (string, error) {
 	var rb1 strings.Builder
 	rb1.WriteString("[")
 	scanRequest, err := hrpc.NewScanRangeStr(context.Background(), kv.table,
-		key, "", hrpc.NumberOfRows(1000))
+		key, "", hrpc.NumberOfRows(100))
 	if err != nil {
 		kv.logger.Sugar().Errorf("error scanRequest : %s ", err)
 	}
@@ -99,7 +78,38 @@ func (kv *KV) GetFromKeyWithLimit(key string, limit int64) (string, error) {
 		r, err := scanner.Next()
 		if r != nil {
 			for _, v := range r.Cells {
-				rb1.WriteString(v.String())
+				rb1.WriteString(string(v.Value))
+				rb1.WriteString(",")
+				kv.logger.Sugar().Infof("response : %s ", v.String())
+			}
+		}
+		if err != nil {
+			kv.logger.Sugar().Errorf("error in scanner : %s ", err)
+			break
+		}
+	}
+	rb2 := strings.TrimSuffix(rb1.String(), ",")
+	rb2 = rb2 + "]"
+	kv.logger.Sugar().Infof("final response : %s ", rb2)
+	return rb2, nil
+}
+
+// GetFromKeyWithLimit fetches data after a time range with limit
+func (kv *KV) GetKeyWithLimit(key string, limit uint32) (string, error) {
+	var rb1 strings.Builder
+	rb1.WriteString("[")
+	scanRequest, err := hrpc.NewScanRangeStr(context.Background(), kv.table,
+		key, "", hrpc.NumberOfRows(limit))
+	if err != nil {
+		kv.logger.Sugar().Errorf("error scanRequest : %s ", err)
+	}
+	scanner := kv.cli.Scan(scanRequest)
+	kv.logger.Sugar().Infof("into query : %s / %s ", kv.table, key)
+	for {
+		r, err := scanner.Next()
+		if r != nil {
+			for _, v := range r.Cells {
+				rb1.WriteString(string(v.Value))
 				rb1.WriteString(",")
 				kv.logger.Sugar().Infof("response : %s ", v.String())
 			}
