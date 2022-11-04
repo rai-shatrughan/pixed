@@ -47,14 +47,14 @@ func (kv *KV) Get(key string) (string, error) {
 		kv.logger.Sugar().Errorf("error scanRequest : %s ", err)
 	}
 	scanner := kv.cli.Scan(scanRequest)
-	kv.logger.Sugar().Infof("into query : %s / %s ", kv.table, key)
+	kv.logger.Sugar().Debugf("into query : %s / %s ", kv.table, key)
 	for {
 		r, err := scanner.Next()
 		if r != nil {
 			for _, v := range r.Cells {
 				rb1.WriteString(string(v.Value))
 				rb1.WriteString(",")
-				kv.logger.Sugar().Infof("response : %s ", v.String())
+				kv.logger.Sugar().Debugf("response : %s ", v.String())
 			}
 		}
 		if err != nil {
@@ -64,6 +64,6 @@ func (kv *KV) Get(key string) (string, error) {
 	}
 	rb2 := strings.TrimSuffix(rb1.String(), ",")
 	rb2 = rb2 + "]"
-	kv.logger.Sugar().Infof("final response : %s ", rb2)
+	kv.logger.Sugar().Debugf("final response : %s ", rb2)
 	return rb2, nil
 }

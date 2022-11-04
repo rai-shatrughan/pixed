@@ -108,10 +108,10 @@ func consume(wg *sync.WaitGroup, ctx context.Context, num int) {
 			m, err := reader.ReadMessage(ctxTimeout)
 			if err != nil {
 				if strings.Contains(err.Error(), "context deadline exceeded") {
-					logger.Sugar().Infof("no new kafka msg in last 10 seconds")
+					logger.Sugar().Debugf("no new kafka msg in last 10 seconds")
 					break
 				}
-				logger.Sugar().Infof("error reading kafka:", err)
+				logger.Sugar().Errorf("error reading kafka:", err)
 				break
 			}
 			// fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
@@ -128,12 +128,12 @@ func consume(wg *sync.WaitGroup, ctx context.Context, num int) {
 				ts, _ := json.Marshal(tsa[i])
 				value := string(ts)
 
-				logger.Sugar().Info("writing : ", key)
+				logger.Sugar().Debugf("writing : ", key)
 				values := map[string]map[string][]byte{"cf": {"a": []byte(value)}}
 				putRequest, _ := hrpc.NewPutStr(context.Background(), hbaseTable, key, values)
 				rsp, err := client.Put(putRequest)
 
-				logger.Sugar().Info("Insert status : ", rsp)
+				logger.Sugar().Debugf("Insert status : ", rsp)
 				if err != nil {
 					logger.Sugar().Error("error in writing to hbase - ", err)
 				}
