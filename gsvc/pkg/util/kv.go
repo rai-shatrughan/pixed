@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"strings"
 
 	// "os"
 
@@ -22,6 +23,7 @@ func (kv *KV) New(conf *Config, logger *Logger) {
 	kv.conf = conf
 	kv.logger = logger
 	kv.cli = gohbase.NewClient(conf.GetString("hbase.zookeeper"))
+	kv.table = conf.GetString("hbase.table")
 }
 
 // Put upserts data into KV store
@@ -84,5 +86,31 @@ func (kv *KV) Put(table, key, value string) error {
 
 // GetFromKeyWithLimit fetches data after a time range with limit
 func (kv *KV) GetFromKeyWithLimit(key string, limit int64) (string, error) {
-	return "", nil
+	var rb1 strings.Builder
+	rb1.WriteString("[")
+	scanRequest, err := hrpc.NewScanRangeStr(context.Background(), kv.table,
+		key, "", hrpc.NumberOfRows(1000))
+	if err != nil {
+		kv.logger.Sugar().Errorf("error scanRequest : %s ", err)
+	}
+	scanner := kv.cli.Scan(scanRequest)
+	kv.logger.Sugar().Infof("into query : %s / %s ", kv.table, key)
+	for {
+		r, err := scanner.Next()
+		if r != nil {
+			for _, v := range r.Cells {
+				rb1.WriteString(v.String())
+				rb1.WriteString(",")
+				kv.logger.Sugar().Infof("response : %s ", v.String())
+			}
+		}
+		if err != nil {
+			kv.logger.Sugar().Errorf("error in scanner : %s ", err)
+			break
+		}
+	}
+	rb2 := strings.TrimSuffix(rb1.String(), ",")
+	rb2 = rb2 + "]"
+	kv.logger.Sugar().Infof("final response : %s ", rb2)
+	return rb2, nil
 }

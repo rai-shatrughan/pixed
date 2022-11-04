@@ -10,6 +10,7 @@ kafka:
   startOffSet: -1 
 hbase:
   zookeeper: "172.18.0.131"
+  table: "ts"
 
 svc:
   stream:
