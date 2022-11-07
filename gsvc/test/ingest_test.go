@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -15,6 +14,7 @@ import (
 	model "gsvc/pkg/model"
 	"gsvc/pkg/util"
 	"gsvc/test/data"
+	"gsvc/test/perf"
 )
 
 var (
@@ -46,25 +46,34 @@ func hostCheck() {
 
 func TestPostTimeseries(t *testing.T) {
 	tsBytes := getTSBytes()
+	mt := perf.Metric{}
+	mt.SetStartTime(time.Now())
+
 	for _, agent := range agents {
 		// time.Sleep(time.Millisecond * 500)
-		logger.Sugar().Infof("agent : %s", agent)
+		// logger.Sugar().Infof("agent : %s", agent)
+		st := time.Now()
 		res, err := http.Post(tsPostURL+agent, "application/json", strings.NewReader(tsBytes))
+		dur := time.Since(st)
 		if err != nil && res.StatusCode != 200 {
 			t.Failed()
 		}
+		mt.IncrCount(1)
+		mt.IncrDuration(dur)
 	}
+	mt.SetEndTime(time.Now())
+	logger.Sugar().Infof("count - %v : duration - %v : start - %v : end - %v ", mt.Count(), mt.Duration(), mt.StartTime(), mt.EndTime())
 }
 
 func TestGetTimeseries(t *testing.T) {
 	for _, agent := range agents {
-		logger.Sugar().Infof("agent : %s", agent)
+		// logger.Sugar().Infof("agent : %s", agent)
 		res, err := http.Get(tsGetURL + agent)
 		if err != nil && res.StatusCode != 200 {
 			t.Failed()
 		}
-		resp_body, _ := io.ReadAll(res.Body)
-		logger.Sugar().Infof("agent - %s , response : %s", agent, resp_body)
+		// resp_body, _ := io.ReadAll(res.Body)
+		// logger.Sugar().Infof("agent - %s , response : %s", agent, resp_body)
 	}
 }
 
