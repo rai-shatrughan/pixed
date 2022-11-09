@@ -60,11 +60,15 @@ test:
 	cd gsvc; \
 	go test test/ingest_test.go -args -host gsvc
 
-testr:
-	cd gsvc; \
-	go test test/exch_test.go -args -host rsvc
+bench:
+	cd gsvc/test; \
+	go test -bench=. -v
 
 perf:
+	cd gsvc; \
+	go run test/cmd/perf.go -host gsvc
+
+wrk:
 	cd gsvc; \
 	bash test/runGowrk.sh
 

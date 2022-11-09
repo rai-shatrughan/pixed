@@ -6,6 +6,7 @@ type Metric struct {
 	// maxDuration time.Duration
 	// minDuration time.Duration
 	// avgDuration time.Duration
+	failed    int64
 	count     int64
 	duration  time.Duration
 	startTime time.Time
@@ -42,6 +43,14 @@ func (m *Metric) IncrCount(c int64) {
 
 func (m *Metric) Count() int64 {
 	return m.count
+}
+
+func (m *Metric) IncrFailed(c int64) {
+	m.failed = m.failed + c
+}
+
+func (m *Metric) Failed() int64 {
+	return m.failed
 }
 
 func (m *Metric) AvgDuration() time.Duration {
