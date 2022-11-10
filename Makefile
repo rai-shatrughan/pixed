@@ -64,9 +64,13 @@ bench:
 	cd gsvc/test; \
 	go test -bench=. -v
 
-perf:
+perfn:
 	cd gsvc; \
-	go run test/cmd/perf.go -host gsvc
+	go run test/cmd_new/perf_new.go -host gsvc
+
+perfo:
+	cd gsvc; \
+	go run test/cmd_old/perf_old.go -host gsvc
 
 wrk:
 	cd gsvc; \

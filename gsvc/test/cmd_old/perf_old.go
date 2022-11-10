@@ -29,7 +29,7 @@ func main() {
 
 	var mt perf.Metric
 	poolsize := 8000
-	duration := 100 // seconds
+	duration := 10 // seconds
 	// conGoroutines := make(chan struct{}, poolsize)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(duration+2)*time.Second)
@@ -52,10 +52,10 @@ func main() {
 	for responders < poolsize {
 		select {
 		case <-sigChan:
-			cm.Logger.Sugar().Infof("Result %v ", aggResult.ReqCount)
+			cm.Logger.Sugar().Infof("Result %v ", aggResult)
 			return
 		case <-ctx.Done():
-			cm.Logger.Sugar().Infof("Result %v ", aggResult.ReqCount)
+			cm.Logger.Sugar().Infof("Result %v ", aggResult)
 			return
 		case result := <-resultChan:
 			aggResult.ReqCount += result.ReqCount
@@ -85,14 +85,14 @@ func ingest(duration int, agent string, resultChan chan<- *Result) {
 		resp, err := client.Do(req)
 		dur := time.Since(st)
 		if resp != nil && resp.Body != nil {
+			cm.Logger.Sugar().Infof("res", resp.StatusCode)
 			resp.Body.Close()
 		}
 		if err != nil {
 			cm.Logger.Sugar().Errorf("err", err)
 			result.TotalErr++
-		} else {
-			cm.Logger.Sugar().Infof("res", resp.StatusCode)
 		}
+
 		result.TotalDur += dur
 		result.ReqCount++
 		// cm.Logger.Sugar().Infof("count %v", result.ReqCount)
