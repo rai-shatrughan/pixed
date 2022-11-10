@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
 	"time"
 
@@ -10,10 +12,10 @@ import (
 	"gsvc/test/perf"
 )
 
-type result struct {
-	resp *http.Response
-	dur  time.Duration
-	err  error
+type Result struct {
+	ReqCount int64
+	TotalDur time.Duration
+	TotalErr int64
 }
 
 func init() {
@@ -22,55 +24,92 @@ func init() {
 }
 
 func main() {
-	var mt perf.Metric
-	poolsize := 1000
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	var mt perf.Metric
+	poolsize := 8000
+	duration := 100 // seconds
+	// conGoroutines := make(chan struct{}, poolsize)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(duration+2)*time.Second)
 	defer cancel()
 
-	resultChan := make(chan result, poolsize)
+	resultChan := make(chan *Result, poolsize)
 	agentChan := make(chan string, poolsize)
 
 	mt.SetStartTime(time.Now())
-	go updateAgentChan(poolsize, agentChan)
+	// counter := 0
+	go fillAgentChan(ctx, agentChan)
+
+	for i := 0; i < poolsize; i++ {
+		agent := cm.Agents[i%len(cm.Agents)]
+		go ingest(duration, agent, resultChan)
+	}
+
+	responders := 0
+	aggResult := Result{}
+	for responders < poolsize {
+		select {
+		case <-sigChan:
+			cm.Logger.Sugar().Infof("Result %v ", aggResult.ReqCount)
+			return
+		case <-ctx.Done():
+			cm.Logger.Sugar().Infof("Result %v ", aggResult.ReqCount)
+			return
+		case result := <-resultChan:
+			aggResult.ReqCount += result.ReqCount
+			aggResult.TotalDur += result.TotalDur
+			aggResult.TotalErr += result.TotalErr
+			responders++
+		}
+	}
+	cm.Logger.Sugar().Infof("Result %v ", aggResult)
+}
+
+func ingest(duration int, agent string, resultChan chan<- *Result) {
+	client := &http.Client{}
+	//overriding the default parameters
+	client.Transport = &http.Transport{
+		DisableCompression:    false,
+		DisableKeepAlives:     true,
+		ResponseHeaderTimeout: time.Millisecond * time.Duration(30000),
+	}
+
+	result := &Result{}
+	start := time.Now()
+	for time.Since(start).Seconds() <= float64(duration) {
+		tsBytes := cm.GetTSBytes()
+		st := time.Now()
+		req, _ := http.NewRequest("POST", cm.TSPostURL+agent, strings.NewReader(tsBytes))
+		resp, err := client.Do(req)
+		dur := time.Since(st)
+		if resp != nil && resp.Body != nil {
+			resp.Body.Close()
+		}
+		if err != nil {
+			cm.Logger.Sugar().Errorf("err", err)
+			result.TotalErr++
+		} else {
+			cm.Logger.Sugar().Infof("res", resp.StatusCode)
+		}
+		result.TotalDur += dur
+		result.ReqCount++
+		// cm.Logger.Sugar().Infof("count %v", result.ReqCount)
+		// time.Sleep(1 * time.Second)
+	}
+	resultChan <- result
+}
+
+func fillAgentChan(ctx context.Context, agentChan chan<- string) {
+	counter := 0
 	for {
 		select {
 		case <-ctx.Done():
-			mt.SetEndTime(time.Now())
-			cm.Logger.Sugar().Infof("count - %v : duration - %v : start - %v : end - %v ", mt.Count(), mt.Duration(), mt.StartTime(), mt.EndTime())
 			return
-		case agent := <-agentChan:
-			go ingest(agent, resultChan)
-		case result := <-resultChan:
-			updateMetric(result, &mt)
+		default:
+			agentChan <- cm.Agents[counter%len(cm.Agents)]
+			counter++
 		}
-	}
-}
-
-func ingest(agent string, resultChan chan<- result) {
-	tsBytes := cm.GetTSBytes()
-	st := time.Now()
-	response, err := http.Post(cm.TSPostURL+agent, "application/json", strings.NewReader(tsBytes))
-	d := time.Since(st)
-	cm.Logger.Sugar().Infof("res - %v : dur - %v : err - %v ", response.StatusCode, d, err)
-	resultChan <- result{response, d, err}
-}
-
-func updateMetric(res result, mt *perf.Metric) {
-	mt.IncrCount(1)
-	if res.err != nil {
-		mt.IncrFailed(1)
-		cm.Logger.Sugar().Errorf("error in call", res.err)
-	}
-	mt.IncrDuration(res.dur)
-	cm.Logger.Sugar().Infof("count - %v : failed - %v ", mt.Count(), mt.Failed())
-}
-
-func updateAgentChan(poolsize int, agentChan chan<- string) {
-	for {
-		for i := 0; i < poolsize; i++ {
-			agentChan <- cm.Agents[i%400]
-		}
-		time.Sleep(1 * time.Second)
 	}
 }
