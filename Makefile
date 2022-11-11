@@ -30,8 +30,8 @@ appbin:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../docker/app/bin/consumer pkg/consumer/main.go; \
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../docker/app/bin/gsvc server/main.go
 	cd rsvc; \
-	cargo install --target x86_64-unknown-linux-musl --path . ; \
-	cp target/x86_64-unknown-linux-musl/release/rsvc ../docker/app/bin/rsvc
+	cargo install --path . ; \
+	cp target/release/rsvc ../docker/app/bin/rsvc
 
 buildd:
 	cd docker; \
@@ -86,8 +86,9 @@ gsvc:
 
 rsvc:
 	cd rsvc; \
-	cargo install --target x86_64-unknown-linux-musl --path . ; \
-	cp target/x86_64-unknown-linux-musl/release/rsvc ../docker/app/bin/rsvc
+	mkdir -p ../docker/app/bin/; \
+	cargo install --path . ; \
+	cp target/release/rsvc ../docker/app/bin/rsvc
 	docker-compose -f docker/docker-compose.yml --env-file docker/.env build rsvc 
 	docker-compose -f docker/docker-compose.yml --env-file docker/.env up -d rsvc
 	$(MAKE) clean
