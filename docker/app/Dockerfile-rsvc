@@ -1,4 +1,3 @@
-#FROM debian:bullseye-slim
-FROM scratch
+FROM debian:bullseye-slim
 COPY docker/app/bin/rsvc /usr/bin/rsvc
 ENV WEB_DIR=/dist
