@@ -87,8 +87,8 @@ gsvc:
 rsvc:
 	cd rsvc; \
 	mkdir -p ../docker/app/bin/; \
-	cargo install --path . ; \
-	cp target/release/rsvc ../docker/app/bin/rsvc
+	PKG_CONFIG_ALLOW_CROSS=true PKG_CONFIG_ALL_STATIC=true LIBZ_SYS_STATIC=1 CC=musl-gcc CXX=g++ cargo build --release --target x86_64-unknown-linux-musl
+	cp rsvc/target/x86_64-unknown-linux-musl/release/rsvc docker/app/bin/rsvc
 	docker-compose -f docker/docker-compose.yml --env-file docker/.env build rsvc 
 	docker-compose -f docker/docker-compose.yml --env-file docker/.env up -d rsvc
 	$(MAKE) clean
