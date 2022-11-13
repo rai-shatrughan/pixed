@@ -17,4 +17,5 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tower-http = { version = "0.3.4", features = ["trace", "fs"] }
 chrono = "0.4.22"
 hyper = "0.14"
+rocksdb = "0.19.0"
 

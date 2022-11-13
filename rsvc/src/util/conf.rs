@@ -5,6 +5,7 @@ pub struct Props {
     pub base_path: String,
     pub web_dir: String,
     pub web_address: String,
+    pub kv_dir: String,
     pub test_default: String,
 }
 
@@ -15,6 +16,7 @@ impl Props {
             base_path: set_base_path(),
             web_dir: set_web_dir(),
             web_address: set_web_address(),
+            kv_dir: set_kv_dir(),
             test_default: Default::default(),
         }
     }
@@ -45,5 +47,12 @@ fn set_web_address() -> String{
     return match env::var("WEB_ADDRESS") {
             Ok(val) => val,
             Err(_e) => "0.0.0.0:9000".to_string(),
+    };
+}
+
+fn set_kv_dir() -> String{
+    return match env::var("KV_DIR") {
+            Ok(val) => val,
+            Err(_e) => "/data/kv_def_dir".to_string(),
     };
 }

@@ -24,6 +24,9 @@ async fn main() {
     }
 
     tracing_subscriber::fmt::init();
+    util::kv::put(String::from("sr"), String::from("sr-value"));
+    println!("{}",util::kv::get(String::from("sr")));
+    println!("{}",util::kv::get(String::from("s2")));
     let kafka_producer = util::kafka::KafkaProducer::init();
     let service = tower_http::services::ServeDir::new(util::conf::Props::init().web_dir);
     let app = Router::new()
