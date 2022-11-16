@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"gsvc/handler"
 	// "gsvc/handler/mc"
 	// "gsvc/handler/stream"
+	"gsvc/handler"
 	"gsvc/mware"
 	"gsvc/pkg/util"
 
@@ -20,13 +20,13 @@ import (
 )
 
 var (
-	conf        util.Config
-	logger      util.Logger
+	conf        = &util.Config{}
+	logger      = &util.Logger{}
 	mux         *http.ServeMux
 	wrappedMux  http.Handler
 	httpAddr    string
-	kf          util.KafkaWriter
-	kv          util.KV
+	kfw         = &util.KafkaWriter{}
+	kv          = &util.KV{}
 	serviceName = os.Getenv("SERVICE_NAME")
 	jaegerIP    = os.Getenv("JAEGER_IP")
 	mdlw        middleware.Middleware
@@ -36,28 +36,28 @@ func main() {
 
 	conf.New()
 	logger.New()
-	kv.New(&conf, &logger)
-	kf.New(&conf, &logger)
+	kv.New(conf, logger)
+	kfw.New(conf, logger)
 	httpAddr = conf.GetString("http.address")
 	mux = http.NewServeMux()
 
 	mdlw = mware.InitMetricMiddleware()
 
-	tp := mware.InitTracer(jaegerIP, &logger)
-	defer mware.TracerShutDown(tp, &logger)
+	tp := mware.InitTracer(jaegerIP, logger)
+	defer mware.TracerShutDown(tp, logger)
 
-	hndlr := handler.New(
-		mux,
-		&conf,
-		&logger,
-		&kf,
-		&kv,
-		serviceName,
-	)
+	appState := util.AppState{
+		Mux:         mux,
+		Conf:        conf,
+		Logger:      logger,
+		Kfw:         kfw,
+		Kv:          kv,
+		ServiceName: serviceName,
+	}
 
-	hndlr.RegisterHandlers()
+	handler.RegisterHandlers(appState)
 
-	wrappedMux = mware.LoggingMiddleware(&logger, mux)
+	wrappedMux = mware.LoggingMiddleware(logger, mux)
 	wrappedMux = mware.TracingMiddleware(serviceName, wrappedMux)
 	wrappedMux = mware.PrometheusMiddleware(mdlw, wrappedMux)
 	wrappedMux = mware.SetAccessControl(wrappedMux)

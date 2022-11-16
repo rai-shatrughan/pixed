@@ -22,10 +22,10 @@ var (
 	uploadSuccessMsg = "{\"TimeseriesUpload\": \"Ok\"}"
 )
 
-func PostMixedTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler {
+func PostMixedTimeseries(st util.AppState) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tsa model.TimeseriesArray
-		assetId := r.URL.Path[:1]
+		assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
 
 		_, span := tracer.Start(r.Context(), "postTS", oteltrace.WithAttributes(attribute.String("assetId", assetId)))
 		defer span.End()
@@ -37,7 +37,7 @@ func PostMixedTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler
 
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			logger.Sugar().Errorln("Error in reading Multipart TS body", err)
+			st.Logger.Sugar().Errorln("Error in reading Multipart TS body", err)
 			mware.ResponseWriter(w, "", 500)
 		}
 
@@ -46,14 +46,14 @@ func PostMixedTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler
 
 		if err := json.Unmarshal([]byte(jsonBody), &tsa); err != nil {
 			mware.ResponseWriter(w, processErrMsg, http.StatusInternalServerError)
-			logger.Error(err.Error())
+			st.Logger.Error(err.Error())
 		}
 
 		kfmsg := []byte(jsonBody)
 
-		if err := kf.Write([]byte(assetId), []byte(kfmsg)); err != nil {
+		if err := st.Kfw.Write([]byte(assetId), []byte(kfmsg)); err != nil {
 			mware.ResponseWriter(w, processErrMsg, http.StatusInternalServerError)
-			logger.Error(err.Error())
+			st.Logger.Error(err.Error())
 			return
 		} else {
 			mware.ResponseWriter(w, uploadSuccessMsg, http.StatusOK)
@@ -62,21 +62,19 @@ func PostMixedTimeseries(kf *util.KafkaWriter, logger *util.Logger) http.Handler
 	})
 }
 
-func GetTimeseries(kv *util.KV, logger *util.Logger) http.Handler {
+func GetTimeseries(st util.AppState) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assetId := r.URL.Path[:1]
+		assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
 		if assetId == "" {
 			mware.ResponseWriter(w, assetErrMsg, http.StatusBadRequest)
 			return
 		}
-
-		res, err := kv.Get(assetId)
+		res, err := st.Kv.Get(assetId)
 		if err != nil {
 			mware.ResponseWriter(w, processErrMsg, http.StatusInternalServerError)
-			logger.Error(err.Error())
+			st.Logger.Error(err.Error())
 		} else {
 			mware.ResponseWriter(w, res, http.StatusOK)
 		}
-
 	})
 }

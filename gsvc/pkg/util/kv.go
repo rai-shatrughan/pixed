@@ -58,7 +58,7 @@ func (kv *KV) Get(key string) (string, error) {
 			}
 		}
 		if err != nil {
-			kv.logger.Sugar().Errorf("error in scanner : %s ", err)
+			// kv.logger.Sugar().Errorf("error in scanner : %s ", err)
 			break
 		}
 	}

@@ -6,6 +6,6 @@ import (
 	"gsvc/pkg/util"
 )
 
-func StreamHandler(conf *util.Config) http.Handler {
-	return http.StripPrefix(conf.GetString("basepath.stream"), http.FileServer(http.Dir(conf.GetString("svc.stream.dir"))))
+func StreamHandler(st util.AppState) http.Handler {
+	return http.StripPrefix(st.Conf.GetString("basepath.stream"), http.FileServer(http.Dir(st.Conf.GetString("svc.stream.dir"))))
 }
