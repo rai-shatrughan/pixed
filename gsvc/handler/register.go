@@ -4,37 +4,39 @@ import (
 	"gsvc/handler/mc"
 	"gsvc/handler/stream"
 	"gsvc/pkg/util"
+	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type SVCHandlers struct {
-	MuxRouter *mux.Router
-	Conf      *util.Config
-	Logger    *util.Logger
-	Kf        *util.KafkaWriter
-	Kv        *util.KV
+type svcHandler struct {
+	mux         *http.ServeMux
+	conf        *util.Config
+	logger      *util.Logger
+	kf          *util.KafkaWriter
+	kv          *util.KV
+	serviceName string
 }
 
-func (sh SVCHandlers) RegisterHandlers() {
-	streamPath := sh.Conf.GetString("basepath.stream")
-	exchange := sh.Conf.GetString("basepath.exchange") + "{assetId}"
-	timeseries := sh.Conf.GetString("basepath.timeseries") + "{assetId}"
+func (sh svcHandler) RegisterHandlers() {
+	streamPath := sh.conf.GetString("basepath.stream")
+	exchange := sh.conf.GetString("basepath.exchange")
+	timeseries := sh.conf.GetString("basepath.timeseries")
 
-	sh.MuxRouter.
-		Path(exchange).
-		Handler(mc.PostMixedTimeseries(sh.Kf, sh.Logger)).
-		Methods("POST")
+	sh.mux.Handle(exchange, mc.PostMixedTimeseries(sh.kf, sh.logger))
+	sh.mux.Handle(timeseries, mc.GetTimeseries(sh.kv, sh.logger))
 
-	sh.MuxRouter.
-		Path(timeseries).
-		Handler(mc.GetTimeseries(sh.Kv, sh.Logger)).
-		Methods("GET")
+	sh.mux.Handle(streamPath, stream.StreamHandler(sh.conf))
+	sh.mux.Handle("/metrics", promhttp.Handler())
+}
 
-	sh.MuxRouter.
-		Path(streamPath).
-		Handler(stream.StreamHandler(sh.Conf))
-
-	sh.MuxRouter.Path("/metrics").Handler(promhttp.Handler())
+func New(mux *http.ServeMux, conf *util.Config, logger *util.Logger, kf *util.KafkaWriter, kv *util.KV, serviceName string) svcHandler {
+	return svcHandler{
+		mux:         mux,
+		conf:        conf,
+		logger:      logger,
+		kf:          kf,
+		kv:          kv,
+		serviceName: serviceName,
+	}
 }

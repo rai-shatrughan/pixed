@@ -44,6 +44,6 @@ func TestGetTimeseries(t *testing.T) {
 			t.Failed()
 		}
 		// resp_body, _ := io.ReadAll(res.Body)
-		// logger.Sugar().Infof("agent - %s , response : %s", agent, resp_body)
+		// fmt.Printf("agent - %s , response : %s", agent, resp_body)
 	}
 }

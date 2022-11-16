@@ -145,3 +145,8 @@ type TokenKey struct {
 type TokenKeys struct {
 	Keys []TokenKey `json:"keys"`
 }
+
+type UnAuthorized struct {
+	Id      string `json:"id"`
+	Message string `json:"message"`
+}

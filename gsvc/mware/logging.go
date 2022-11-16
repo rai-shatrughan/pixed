@@ -35,29 +35,26 @@ func (o *responseObserver) WriteHeader(code int) {
 }
 
 // LoggingMiddleware logs the incoming HTTP request & its duration.
-func LoggingMiddleware(log *util.Logger) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		fn := func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-			obs := &responseObserver{ResponseWriter: w}
-			next.ServeHTTP(obs, r)
-			blank := " "
-			hyphen := "-"
-			// LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined
-			log.Sugar().Info(
-				r.RemoteAddr, blank,
-				hyphen, blank,
-				r.URL.User, blank,
-				start.Format(time.RFC3339), blank,
-				r.Method, blank, r.URL.EscapedPath(), blank, r.Proto, blank,
-				obs.status, blank,
-				obs.written, blank,
-				time.Since(start), blank,
-				r.Referer(), blank,
-				r.UserAgent(),
-			)
-		}
-
-		return http.HandlerFunc(fn)
+func LoggingMiddleware(log *util.Logger, next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		obs := &responseObserver{ResponseWriter: w}
+		next.ServeHTTP(obs, r)
+		blank := " "
+		hyphen := "-"
+		// LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined
+		log.Sugar().Info(
+			r.RemoteAddr, blank,
+			hyphen, blank,
+			r.URL.User, blank,
+			start.Format(time.RFC3339), blank,
+			r.Method, blank, r.URL.EscapedPath(), blank, r.Proto, blank,
+			obs.status, blank,
+			obs.written, blank,
+			time.Since(start), blank,
+			r.Referer(), blank,
+			r.UserAgent(),
+		)
 	}
+	return http.HandlerFunc(fn)
 }

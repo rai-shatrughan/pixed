@@ -50,7 +50,10 @@ func TracerShutDown(tp *sdktrace.TracerProvider, logger *util.Logger) func() {
 	}
 }
 
-func TracingMiddleware(serviceName string) func(http.Handler) http.Handler {
-	return otelmux.Middleware(serviceName)
-
+func TracingMiddleware(serviceName string, next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+		otelmux.Middleware(serviceName)
+	}
+	return http.HandlerFunc(fn)
 }

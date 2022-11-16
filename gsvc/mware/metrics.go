@@ -16,9 +16,6 @@ func InitMetricMiddleware() middleware.Middleware {
 	})
 }
 
-func PrometheusMiddleware(mdlw middleware.Middleware) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return std.Handler("", mdlw, next)
-	}
-
+func PrometheusMiddleware(mdlw middleware.Middleware, next http.Handler) http.Handler {
+	return std.Handler("", mdlw, next)
 }
