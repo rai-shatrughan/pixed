@@ -1,12 +1,11 @@
 module gsvc
 
-go 1.19
+go 1.18
 
 require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/gorilla/mux v1.8.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/segmentio/kafka-go v0.4.35
 	github.com/slok/go-http-metrics v0.10.0
@@ -32,6 +31,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
