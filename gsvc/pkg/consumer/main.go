@@ -56,7 +56,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	quitHandler(cancel)
 	createTable()
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go consume(&wg, ctx, i)
 	}

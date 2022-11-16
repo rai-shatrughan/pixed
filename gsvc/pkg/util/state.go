@@ -8,5 +8,5 @@ type AppState struct {
 	Logger      *Logger
 	Kfw         *KafkaWriter
 	Kv          *KV
-	ServiceName string
+	ServiceName *string
 }

@@ -46,13 +46,13 @@ func main() {
 	tp := mware.InitTracer(jaegerIP, logger)
 	defer mware.TracerShutDown(tp, logger)
 
-	appState := util.AppState{
+	appState := &util.AppState{
 		Mux:         mux,
 		Conf:        conf,
 		Logger:      logger,
 		Kfw:         kfw,
 		Kv:          kv,
-		ServiceName: serviceName,
+		ServiceName: &serviceName,
 	}
 
 	handler.RegisterHandlers(appState)

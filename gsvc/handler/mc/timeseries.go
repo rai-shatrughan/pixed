@@ -22,7 +22,7 @@ var (
 	uploadSuccessMsg = "{\"TimeseriesUpload\": \"Ok\"}"
 )
 
-func PostMixedTimeseries(st util.AppState) http.Handler {
+func PostMixedTimeseries(st *util.AppState) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tsa model.TimeseriesArray
 		assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
@@ -62,7 +62,7 @@ func PostMixedTimeseries(st util.AppState) http.Handler {
 	})
 }
 
-func GetTimeseries(st util.AppState) http.Handler {
+func GetTimeseries(st *util.AppState) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
 		if assetId == "" {

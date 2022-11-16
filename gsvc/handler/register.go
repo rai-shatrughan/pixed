@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func RegisterHandlers(st util.AppState) {
+func RegisterHandlers(st *util.AppState) {
 	streamPath := st.Conf.GetString("basepath.stream")
 	exchange := st.Conf.GetString("basepath.exchange")
 	timeseries := st.Conf.GetString("basepath.timeseries")
