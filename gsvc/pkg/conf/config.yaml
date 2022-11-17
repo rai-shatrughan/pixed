@@ -18,10 +18,5 @@ svc:
 
 http:
   address: "0.0.0.0:8000"
-  
-basepath:
-  stream: "/api/v1/stream/"
-  timeseries: "/api/iottimeseries/v3/timeseries/"
-  exchange: "/api/mindconnect/v3/exchange/"
-  agm: "/api/agentmanagement/v3/agents/"
+
 

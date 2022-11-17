@@ -46,7 +46,7 @@ func main() {
 	tp := mware.InitTracer(jaegerIP, logger)
 	defer mware.TracerShutDown(tp, logger)
 
-	appState := &util.AppState{
+	st := &util.AppState{
 		Mux:         mux,
 		Conf:        conf,
 		Logger:      logger,
@@ -54,8 +54,10 @@ func main() {
 		Kv:          kv,
 		ServiceName: &serviceName,
 	}
+	api := &handler.ApiHandler{}
+	api.New(st)
 
-	handler.RegisterHandlers(appState)
+	mux.Handle("/", api)
 
 	wrappedMux = mware.LoggingMiddleware(logger, mux)
 	wrappedMux = mware.TracingMiddleware(serviceName, wrappedMux)

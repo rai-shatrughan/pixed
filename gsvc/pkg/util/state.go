@@ -9,4 +9,5 @@ type AppState struct {
 	Kfw         *KafkaWriter
 	Kv          *KV
 	ServiceName *string
+	Params      [10]string
 }

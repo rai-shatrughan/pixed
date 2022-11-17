@@ -25,7 +25,8 @@ var (
 func PostMixedTimeseries(st *util.AppState) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tsa model.TimeseriesArray
-		assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
+		// assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
+		assetId := st.Params[0]
 
 		_, span := tracer.Start(r.Context(), "postTS", oteltrace.WithAttributes(attribute.String("assetId", assetId)))
 		defer span.End()
@@ -64,7 +65,8 @@ func PostMixedTimeseries(st *util.AppState) http.Handler {
 
 func GetTimeseries(st *util.AppState) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
+		// assetId := strings.TrimPrefix(r.URL.Path, st.Conf.GetString("basepath.timeseries"))
+		assetId := st.Params[0]
 		if assetId == "" {
 			mware.ResponseWriter(w, assetErrMsg, http.StatusBadRequest)
 			return
