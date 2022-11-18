@@ -5,9 +5,7 @@ import (
 	"gsvc/handler/stream"
 	"gsvc/pkg/util"
 	"net/http"
-	"regexp"
-	"strconv"
-	"sync"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -21,18 +19,30 @@ func (h *ApiHandler) New(st *util.AppState) {
 }
 
 func (api *ApiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	p := sanitizeNsplit(r.URL.Path)
+	n := len(p)
+
 	var h http.Handler
 
-	p := r.URL.Path
 	switch {
-	case match(p, "/api/mindconnect/v3/exchange/([^/]+)", &api.Params[0]) && r.Method == "POST":
-		h = mc.PostMixedTimeseries(api.AppState)
-	case match(p, "/api/iottimeseries/v3/timeseries/([^/]+)", &api.Params[0]) && r.Method == "GET":
-		h = mc.GetTimeseries(api.AppState)
-	case match(p, "/api/v1/stream"):
+
+	// /api/.../exchange/{assetId}
+	case n > 0 && p[0] == "api" && p[n-2] == "exchange" && r.Method == "POST":
+		h = mc.PostMixedTimeseries(api.AppState, p[n-1])
+
+	// /api/.../timeseries/{assetId}
+	case n > 0 && p[0] == "api" && p[n-2] == "timeseries" && r.Method == "GET":
+		h = mc.GetTimeseries(api.AppState, p[n-1])
+
+	// /api/.../stream
+	case n > 0 && p[0] == "api" && p[n-1] == "stream":
 		h = stream.StreamHandler(api.AppState)
-	case match(p, "/metrics"):
+
+	// /metrics
+	case n > 0 && p[0] == "metrics":
 		h = promhttp.Handler()
+
+	// none of the above
 	default:
 		http.NotFound(w, r)
 		return
@@ -41,42 +51,8 @@ func (api *ApiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.ServeHTTP(w, r)
 }
 
-func match(path, pattern string, vars ...interface{}) bool {
-	regex := mustCompileCached(pattern)
-	matches := regex.FindStringSubmatch(path)
-	if len(matches) <= 0 {
-		return false
-	}
-	for i, match := range matches[1:] {
-		switch p := vars[i].(type) {
-		case *string:
-			*p = match
-		case *int:
-			n, err := strconv.Atoi(match)
-			if err != nil {
-				return false
-			}
-			*p = n
-		default:
-			panic("vars must be *string or *int")
-		}
-	}
-	return true
-}
-
-var (
-	regexen = make(map[string]*regexp.Regexp)
-	relock  sync.Mutex
-)
-
-func mustCompileCached(pattern string) *regexp.Regexp {
-	relock.Lock()
-	defer relock.Unlock()
-
-	regex := regexen[pattern]
-	if regex == nil {
-		regex = regexp.MustCompile("^" + pattern + "$")
-		regexen[pattern] = regex
-	}
-	return regex
+func sanitizeNsplit(path string) []string {
+	p := strings.TrimPrefix(path, "/")
+	p = strings.TrimSuffix(p, "/")
+	return strings.Split(p, "/")
 }

@@ -47,7 +47,6 @@ func main() {
 	defer mware.TracerShutDown(tp, logger)
 
 	st := &util.AppState{
-		Mux:         mux,
 		Conf:        conf,
 		Logger:      logger,
 		Kfw:         kfw,
