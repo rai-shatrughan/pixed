@@ -8,25 +8,27 @@ import (
 	"time"
 
 	kafka "github.com/segmentio/kafka-go"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
 // KafkaReaders wraps kafka.Reader
-type KafkaReaders struct {
-	conf    *Config
-	logger  *Logger
+type kafkaReaders struct {
+	conf    *viper.Viper
+	logger  *zap.Logger
 	Readers []*kafka.Reader
 }
 
 // KafkaWriter wraps kafka.Writer
-type KafkaWriter struct {
-	conf   *Config
-	logger *Logger
+type kafkaWriter struct {
+	conf   *viper.Viper
+	logger *zap.Logger
 	writer *kafka.Writer
 }
 
 // New initializes new instance of readers
-func (kf *KafkaReaders) New(readerCount int, conf *Config, logger *Logger) {
+func NewKafkaReader(readerCount int, conf *viper.Viper, logger *zap.Logger) *kafkaReaders {
+	kf := new(kafkaReaders)
 	kf.conf = conf
 	kf.logger = logger
 
@@ -42,10 +44,12 @@ func (kf *KafkaReaders) New(readerCount int, conf *Config, logger *Logger) {
 		kf.Readers = append(kf.Readers, reader)
 		kf.setupCloseReaderHandler()
 	}
+	return kf
 }
 
 // New initializes new instance of writer
-func (kf *KafkaWriter) New(conf *Config, logger *Logger) {
+func NewKafkaWriter(conf *viper.Viper, logger *zap.Logger) *kafkaWriter {
+	kf := new(kafkaWriter)
 	kf.conf = conf
 	kf.logger = logger
 
@@ -58,10 +62,11 @@ func (kf *KafkaWriter) New(conf *Config, logger *Logger) {
 		}
 	}
 	kf.setupCloseWriterHandler()
+	return kf
 }
 
 // Read returns kafka Message
-func (kf *KafkaReaders) Read(reader *kafka.Reader) (kafka.Message, error) {
+func (kf *kafkaReaders) Read(reader *kafka.Reader) (kafka.Message, error) {
 	kf.logger.Info("Reading message from group",
 		zap.String("groupId", reader.Config().GroupID),
 	)
@@ -84,7 +89,7 @@ func (kf *KafkaReaders) Read(reader *kafka.Reader) (kafka.Message, error) {
 }
 
 // Write pushes data to kafka
-func (kf *KafkaWriter) Write(key, value []byte) error {
+func (kf *kafkaWriter) Write(key, value []byte) error {
 	start := time.Now()
 	kf.logger.Info("Kafka Write", zap.String("start", start.String()))
 	err := kf.writer.WriteMessages(context.Background(),
@@ -104,7 +109,7 @@ func (kf *KafkaWriter) Write(key, value []byte) error {
 }
 
 // BatchWrite puts data into batches
-func (kf *KafkaWriter) BatchWrite(key, val [][]byte) error {
+func (kf *kafkaWriter) BatchWrite(key, val [][]byte) error {
 
 	msgs := make([]kafka.Message, len(key))
 	for k := range key {
@@ -125,14 +130,14 @@ func (kf *KafkaWriter) BatchWrite(key, val [][]byte) error {
 	return nil
 }
 
-func (kf *KafkaWriter) closeWriter() {
+func (kf *kafkaWriter) closeWriter() {
 	kf.logger.Info("Closing writer")
 	if err := kf.writer.Close(); err != nil {
 		kf.logger.Error("Error in Reading msg from Kafka ", zap.Error(err))
 	}
 }
 
-func (kf *KafkaReaders) closeReaders() {
+func (kf *kafkaReaders) closeReaders() {
 	for i := range kf.Readers {
 		kf.logger.Info("Closing reader : ", zap.Int("nos.", i))
 		if err := kf.Readers[i].Close(); err != nil {
@@ -141,7 +146,7 @@ func (kf *KafkaReaders) closeReaders() {
 	}
 }
 
-func (kf *KafkaReaders) setupCloseReaderHandler() {
+func (kf *kafkaReaders) setupCloseReaderHandler() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -152,7 +157,7 @@ func (kf *KafkaReaders) setupCloseReaderHandler() {
 	}()
 }
 
-func (kf *KafkaWriter) setupCloseWriterHandler() {
+func (kf *kafkaWriter) setupCloseWriterHandler() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {

@@ -16,17 +16,13 @@ var (
 	TSPostURL, TSGetURL string
 	Host                = flag.String("host", "gsvc", "Name of service to test")
 	Agents              = data.Agents
-	Kv                  util.KV
-	Logger              util.Logger
-	Conf                util.Config
+	Logger              = util.NewLogger()
+	Conf                = util.NewConfig()
+	Kv                  = util.NewKV(Conf, Logger)
 )
 
 func Setup() {
 	HostCheck()
-	Logger.New()
-	Conf.New()
-
-	Kv.New(&Conf, &Logger)
 }
 
 func HostCheck() {

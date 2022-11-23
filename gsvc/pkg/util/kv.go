@@ -6,29 +6,33 @@ import (
 
 	// "os"
 
+	"github.com/spf13/viper"
 	"github.com/tsuna/gohbase"
 	"github.com/tsuna/gohbase/filter"
 	"github.com/tsuna/gohbase/hrpc"
+	"go.uber.org/zap"
 )
 
 // KV is wrapper for KV Database
-type KV struct {
+type kvStrore struct {
 	cli    gohbase.Client
-	conf   *Config
-	logger *Logger
+	conf   *viper.Viper
+	logger *zap.Logger
 	table  string
 }
 
 // New returns instance of KV Store
-func (kv *KV) New(conf *Config, logger *Logger) {
+func NewKV(conf *viper.Viper, logger *zap.Logger) *kvStrore {
+	kv := new(kvStrore)
 	kv.conf = conf
 	kv.logger = logger
 	kv.cli = gohbase.NewClient(conf.GetString("hbase.zookeeper"))
 	kv.table = conf.GetString("hbase.table")
+	return kv
 }
 
 // Put upserts data into KV store
-func (kv *KV) Put(table, key, value string) error {
+func (kv *kvStrore) Put(table, key, value string) error {
 	kv.logger.Sugar().Info("Writing : ", key)
 	values := map[string]map[string][]byte{"cf": {"a": []byte(value)}}
 	putRequest, _ := hrpc.NewPutStr(context.Background(), table, key, values)
@@ -37,7 +41,7 @@ func (kv *KV) Put(table, key, value string) error {
 }
 
 // GetFromKeyWithLimit fetches data after a time range with limit
-func (kv *KV) Get(key string) (string, error) {
+func (kv *kvStrore) Get(key string) (string, error) {
 	var rb1 strings.Builder
 	rb1.WriteString("[")
 	pFilter := filter.NewPrefixFilter([]byte(key))

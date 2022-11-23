@@ -7,14 +7,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Config is wrapper for config tasks
-type Config struct {
-	*viper.Viper
-}
-
 // New intializes config defaults
-func (c *Config) New() {
-	c.Viper = viper.New()
+func NewConfig() *viper.Viper {
+	c := viper.New()
 	c.AddConfigPath("/etc/conf/") // path to look for the config file in
 	c.AddConfigPath("/conf")      // call multiple times to add many search paths
 	c.AddConfigPath("../conf/")
@@ -33,4 +28,5 @@ func (c *Config) New() {
 	})
 	c.WatchConfig()
 
+	return c
 }

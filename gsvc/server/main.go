@@ -20,13 +20,10 @@ import (
 )
 
 var (
-	conf        = &util.Config{}
-	logger      = &util.Logger{}
+	logger      *zap.Logger
 	mux         *http.ServeMux
 	wrappedMux  http.Handler
 	httpAddr    string
-	kfw         = &util.KafkaWriter{}
-	kv          = &util.KV{}
 	serviceName = os.Getenv("SERVICE_NAME")
 	jaegerIP    = os.Getenv("JAEGER_IP")
 	mdlw        middleware.Middleware
@@ -34,10 +31,10 @@ var (
 
 func main() {
 
-	conf.New()
-	logger.New()
-	kv.New(conf, logger)
-	kfw.New(conf, logger)
+	conf := util.NewConfig()
+	logger = util.NewLogger()
+	kv := util.NewKV(conf, logger)
+	kfw := util.NewKafkaWriter(conf, logger)
 	httpAddr = conf.GetString("http.address")
 	mux = http.NewServeMux()
 

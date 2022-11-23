@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"gsvc/pkg/util"
+	"go.uber.org/zap"
 )
 
 // responseObserver is a minimal wrapper for http.ResponseWriter that allows the
@@ -35,7 +35,7 @@ func (o *responseObserver) WriteHeader(code int) {
 }
 
 // LoggingMiddleware logs the incoming HTTP request & its duration.
-func LoggingMiddleware(log *util.Logger, next http.Handler) http.Handler {
+func LoggingMiddleware(log *zap.Logger, next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		obs := &responseObserver{ResponseWriter: w}

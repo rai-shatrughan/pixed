@@ -13,6 +13,7 @@ import (
 
 	// git modules
 	"github.com/segmentio/kafka-go"
+	"go.uber.org/zap"
 
 	// websvc modules
 	md "gsvc/pkg/model"
@@ -23,8 +24,7 @@ import (
 )
 
 var (
-	logger     util.Logger
-	conf       util.Config
+	logger     *zap.Logger
 	client     gohbase.Client
 	hbaseHost  string
 	hbaseTable string
@@ -33,12 +33,12 @@ var (
 
 func init() {
 
-	conf.New()
+	conf := util.NewConfig()
 
 	hbaseHost = conf.GetString("hbase.zookeeper")
 	hbaseTable = conf.GetString("kafka.topic")
 
-	logger.New()
+	logger = util.NewLogger()
 	client = gohbase.NewClient(hbaseHost)
 
 	reader = kafka.NewReader(kafka.ReaderConfig{

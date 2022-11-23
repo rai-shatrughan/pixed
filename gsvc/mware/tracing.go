@@ -3,12 +3,12 @@ package mware
 import (
 	"context"
 	"fmt"
-	"gsvc/pkg/util"
 	"net/http"
 	"os"
 
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel"
+	"go.uber.org/zap"
 
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
@@ -21,7 +21,7 @@ var (
 	serviceName = os.Getenv("SERVICE_NAME")
 )
 
-func InitTracer(JAEGER_IP string, logger *util.Logger) *sdktrace.TracerProvider {
+func InitTracer(JAEGER_IP string, logger *zap.Logger) *sdktrace.TracerProvider {
 	// exporter, err := stdout.New(stdout.WithPrettyPrint())
 	url := fmt.Sprintf("http://%s:14268/api/traces", JAEGER_IP)
 	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
@@ -42,7 +42,7 @@ func InitTracer(JAEGER_IP string, logger *util.Logger) *sdktrace.TracerProvider 
 	return tp
 }
 
-func TracerShutDown(tp *sdktrace.TracerProvider, logger *util.Logger) func() {
+func TracerShutDown(tp *sdktrace.TracerProvider, logger *zap.Logger) func() {
 	return func() {
 		if err := tp.Shutdown(context.Background()); err != nil {
 			logger.Sugar().Error(err)
