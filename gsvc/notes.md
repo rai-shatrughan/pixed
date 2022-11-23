@@ -1,0 +1,1 @@
+swagger generate model -f agm.yaml -m agm
