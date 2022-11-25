@@ -1,17 +1,9 @@
 package agm
 
-type AgentRequest struct {
-	EntityId        string `json:"entityId"`
-	Name            string `json:"name"`
-	SecurityProfile string `json:"securityProfile"`
-}
+// import (
+// 	"gsvc/model/agm"
+// )
 
-type AgentResponse struct {
-	Id   string `json:"id"`
-	ETag string `json:"eTag"`
-	AgentRequest
-}
-
-func CreateAgent() {
-
-}
+// func CreateAgent() {
+// 	// ag := agm.CreateAgentRequest
+// }
