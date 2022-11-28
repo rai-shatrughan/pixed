@@ -1,0 +1,24 @@
+h1 {
+    /* font-size: large; */
+    color: red;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.div-login {
+    background-color: #dde2e0;
+    width: 100vw;
+    height: 100vh;
+}
+
+button {
+    border: 1cm;
+    /* width: 20px;
+    height: 30px; */
+}
