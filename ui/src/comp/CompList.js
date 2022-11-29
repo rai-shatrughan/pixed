@@ -1,10 +1,10 @@
-export { default as Header } from "./Header";
+export { default as Header } from "./menu/header";
 export { default as Home } from "./Home";
 
 // me
-export { default as Skills } from "./me/Skills";
-export { default as TechStack } from "./me/TechStack";
-export { default as Domains } from "./me/Domains";
+export { default as Skills } from "./about/Skills";
+export { default as TechStack } from "./about/TechStack";
+export { default as Domains } from "./about/Domains";
 
 export { default as VR } from "./3d/VR";
 
