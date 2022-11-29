@@ -47,6 +47,7 @@ body {
   background: var(--font-color);
 }
 
+
 #div-center {
   width: 100vw;
   height: 95vh;
@@ -93,29 +94,12 @@ body {
   height: 95vh;
 }
 
-a:link {
-  text-decoration: underline;
-}
-
-a:visited {
-  text-decoration: underline;
-}
-
-a:active {
-  text-decoration: underline;
-}
-
-
-.pure-menu-link {
-  padding: 10px;
-  color: var(--font-color);
-}
 
 .theme-button {
   height: 1em;
   width: 1em;
   right: 10px;
-  top: 0px;
+  top: 3px;
   background-color: var(--background-color);
   border: none;
   cursor: pointer;

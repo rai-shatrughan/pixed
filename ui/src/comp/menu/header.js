@@ -8,7 +8,7 @@ import {
 export default function Header({ onClicked }) {
 
     return (
-        <div className="pure-menu pure-menu-horizontal" id="div-menu">
+        <div className="pure-menu pure-menu-horizontal">
             <ul className="pure-menu-list">
                 <Simple
                     name="Home"

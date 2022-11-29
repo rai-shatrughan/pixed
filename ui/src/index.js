@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import "./style/index.css";
 import "purecss/build/grids-responsive-min.css";
 import "purecss/build/pure-min.css"
-// import "bulma/css/bulma.css"
 import {
     Header,
     Theme,
@@ -23,15 +22,18 @@ function Index() {
 
     return (
         <div>
-            <Header
-                onClicked={headerClicked}
-            />
-            <Theme
-                theme={theme}
-                onClicked={() =>
-                    setTheme(getTheme())
-                }
-            />
+            <div id="div-menu">
+                <Header
+                    onClicked={headerClicked}
+                />
+
+                <Theme
+                    theme={theme}
+                    onClicked={() =>
+                        setTheme(getTheme())
+                    }
+                />
+            </div>
 
             <div id="div-center">
                 <VisibleComponent theme={theme} />
