@@ -24,7 +24,7 @@ function drawVR() {
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight * 0.95);
     document.getElementById('containerVR').appendChild(renderer.domElement);
 
     const size = 100;

@@ -9,7 +9,7 @@ export default function TechStack(props) {
     });
 
     return (
-        <div className="pure-g g3 techStack">
+        <div className="pure-g" id="techStack">
             <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecTechStack"></div>
         </div>
     );

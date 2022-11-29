@@ -9,7 +9,7 @@ export default function Skills(props) {
 
 
     return (
-        <div className="pure-g g2 skills">
+        <div className="pure-g" id="skills">
             {Array.from(skills.keys()).map((key) =>
                 <div className="pure-u-1 pure-u-md-1-3 skillsItem" id={key} key={key}></div>
             )}

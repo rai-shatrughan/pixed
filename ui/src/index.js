@@ -3,12 +3,12 @@ import { createRoot } from "react-dom/client";
 import "./style/index.css";
 import "purecss/build/grids-responsive-min.css";
 import "bulma/css/bulma.css"
-import { 
-    Header, 
-    Theme, 
+import {
+    Header,
+    Theme,
     getTheme,
     Menus,
-    CompMap 
+    CompMap
 } from "./comp/CompList";
 
 function Index() {
@@ -16,34 +16,35 @@ function Index() {
     const [theme, setTheme] = useState(getTheme());
     const VisibleComponent = CompMap[show];
 
-    function headerClicked(menu, e){
+    function headerClicked(menu, e) {
         e.preventDefault();
         setShow(menu);
     };
-        
-        return (
-            <div>
-                <div className="pure-menu pure-menu-horizontal">
-                    {Menus.map((menu) => (
-                        <Header
-                            menu={menu}
-                            key={menu}
-                            onClicked={(e) => headerClicked(menu, e)}
-                        />
-                    ))}
 
-                    <Theme
-                        theme={theme}
-                        onClicked={() => 
-                            setTheme(getTheme())
-                        }
+    return (
+        <div>
+            <div className="pure-menu pure-menu-horizontal" id="div-menu">
+                {Menus.map((menu) => (
+                    <Header
+                        menu={menu}
+                        key={menu}
+                        onClicked={(e) => headerClicked(menu, e)}
                     />
-                </div>
+                ))}
 
+                <Theme
+                    theme={theme}
+                    onClicked={() =>
+                        setTheme(getTheme())
+                    }
+                />
+            </div>
+            <div id="div-center">
                 <VisibleComponent theme={theme} />
             </div>
-        );
-    }
+        </div>
+    );
+}
 
 const container = document.getElementById("root");
 const root = createRoot(container);

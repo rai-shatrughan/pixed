@@ -8,7 +8,7 @@ export default function Home(props) {
   });
 
   return (
-    <div className="pure-g g1 home">
+    <div className="pure-g" id="home">
       <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeBar"></div>
       <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeName"></div>
       <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4" id="ecHomeTag"></div>

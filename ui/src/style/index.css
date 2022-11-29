@@ -1,55 +1,86 @@
 .light {
-  --color-primary: #0060df;       /* light blue */ 
-  --color-accent: #fd6f53;        /* orange */
-  --background-color: #ffffff;    /* white */
-  --font-color: #000000;          /* black */
+  --color-primary: #0060df;
+  /* light blue */
+  --color-accent: #fd6f53;
+  /* orange */
+  --background-color: #ffffff;
+  /* white */
+  --font-color: #000000;
+  /* black */
 }
 
 .dark {
-  --color-primary: #7ec5a6;       /* light green */    
-  --color-accent: #12cdea;        /* sky blue */
-  --background-color: #100c2a;    /* black */
-  --font-color: #ffffff;          /* white */
+  --color-primary: #7ec5a6;
+  /* light green */
+  --color-accent: #12cdea;
+  /* sky blue */
+  --background-color: #100c2a;
+  /* black */
+  --font-color: #ffffff;
+  /* white */
 }
 
+html,
 body {
-    background: var(--background-color);
-    color: var(--font-color);
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background: var(--background-color);
+  color: var(--font-color);
 }
 
-#ecHomeBar{
+/* Divide page into two */
+#div-menu {
+  /*adjust width to fit theme button */
+  width: 95vw;
+  height: 5vh;
+}
+
+#div-center {
   width: 100vw;
+  height: 95vh;
+}
+
+/* Home Page */
+#home {
+  width: inherit;
+  height: inherit;
+}
+
+#ecHomeBar {
+  width: inherit;
   height: 50vh;
 }
 
-#ecHomeName{
-  width: 100vw;
+#ecHomeName {
+  width: inherit;
   height: 25vh;
 }
 
-#ecHomeTag{
-  width: 100vw;
+#ecHomeTag {
+  width: inherit;
   height: 20vh;
 }
 
 .skillsItem {
-  width: 33vw;
+  width: 100vw;
   height: 45vh;
 }
 
 #ecTechStack {
   width: 100vw;
-  height: 90vh;
+  height: 95vh;
 }
 
 #ecDomains {
   width: 100vw;
-  height: 90vh;
+  height: 95vh;
 }
 
 #containerVR {
   width: 100vw;
-  height: 90vh;
+  height: 95vh;
 }
 
 a:link {
@@ -65,8 +96,8 @@ a:active {
 }
 
 .pure-menu-link {
-    padding: 10px;
-    color: var(--font-color);
+  padding: 10px;
+  color: var(--font-color);
 }
 
 .theme-button {
@@ -76,7 +107,7 @@ a:active {
   top: 0px;
   background-color: var(--background-color);
   border: none;
-  cursor:pointer;  
+  cursor: pointer;
   position: absolute;
 }
 
@@ -86,33 +117,32 @@ a:active {
 }
 
 .pure-menu-horizontal {
-    display: inline-block;
-    width: 95vw;
-    vertical-align: middle;
-    -webkit-font-smoothing: antialiased;
-    background-color: var(--background-color);
-    white-space: nowrap;
-    position: relative;
+  display: inline-block;
+  width: 95vw;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--background-color);
+  white-space: nowrap;
+  position: relative;
 }
 
 .searchVideoForm {
-    padding-top: 50px;
-    width: 50%;
-    margin-left: 25%;
+  padding-top: 50px;
+  width: 50%;
+  margin-left: 25%;
 }
 
 .searchVideoTextBox {
-    background: var(--background-color);
-    color: var(--font-color);
+  background: var(--background-color);
+  color: var(--font-color);
 }
 
 .videoGrid {
-    margin-left: 25%;
-    margin-top: 25px;
+  margin-left: 25%;
+  margin-top: 25px;
 }
 
 .videoItem {
-    width: 65%;
-    height: 400;
+  width: 65%;
+  height: 400;
 }
-      
