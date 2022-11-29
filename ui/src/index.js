@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style/index.css";
 import "purecss/build/grids-responsive-min.css";
-import "purecss/build/pure-min.css"
+import "purecss/build/pure.css"
 import {
     Header,
     Theme,

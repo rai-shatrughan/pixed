@@ -47,6 +47,12 @@ body {
   background: var(--font-color);
 }
 
+.pure-menu li a:hover,
+.pure-menu li a:focus {
+  background: none;
+  border: none;
+  color: #AECFE5;
+}
 
 #div-center {
   width: 100vw;
