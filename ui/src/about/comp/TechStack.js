@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import * as echarts from 'echarts';
-import json from '../../data/techstack.json';
+import json from '../data/techstack.json';
 
 export default function TechStack(props) {
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import * as echarts from 'echarts';
-import json from '../../data/domains.json';
+import json from '../data/domains.json';
 
 export default function Domains(props) {
 

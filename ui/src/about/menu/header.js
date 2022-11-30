@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Simple from './simple';
 import Dropdown from './dropdown';
-import {
-    Menus
-} from "../CompList";
+import { Menus } from "../comp/CompList";
 
 export default function Header({ onClicked }) {
 
