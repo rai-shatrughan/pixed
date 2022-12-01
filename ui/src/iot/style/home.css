@@ -1,0 +1,10 @@
+#div-menu {
+    /*adjust width to fit theme button */
+    width: 95vw;
+    height: 5vh;
+}
+
+#div-center {
+    width: 100vw;
+    height: 95vh;
+}
