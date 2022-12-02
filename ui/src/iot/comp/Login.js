@@ -2,7 +2,6 @@ import React from "react";
 import "../style/login.css";
 
 export default function Login({ loggedIn }) {
-
     return (
         <form className="pure-form pure-form-stacked" id="login-form">
             <fieldset>
@@ -12,7 +11,7 @@ export default function Login({ loggedIn }) {
                 <label htmlFor="default-remember">
                     <input type="checkbox" id="default-remember" /> Remember me
                 </label>
-                <button type="submit" className="pure-button pure-button-primary">Sign in</button>
+                <button type="submit" className="pure-button pure-button-primary">Login</button>
             </fieldset>
         </form >
     );

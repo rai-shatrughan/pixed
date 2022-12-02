@@ -1,23 +1,12 @@
-import React from 'react';
 import "../style/header.css"
-
-const menus = [
-    "Home",
-    "Asset",
-    "Agent",
-    "Metrics",
-    "Insights",
-    "User",
-    "Setting"
-];
+import { Menus } from './Constants';
 
 export default function Header({ onClicked }) {
-
     return (
         <div className="pure-menu pure-menu-horizontal" id="iot-menu">
             <ul className="pure-menu-list">
-                {menus.map((menu) => (
-                    < li className="pure-menu-item">
+                {Menus.map((menu) => (
+                    < li className="pure-menu-item" key={menu}>
                         <a className="pure-menu-link"
                             href="#"
                             key={menu}
@@ -27,6 +16,5 @@ export default function Header({ onClicked }) {
                 ))}
             </ul>
         </div >
-
     );
 }

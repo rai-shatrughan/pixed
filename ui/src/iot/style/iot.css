@@ -14,7 +14,7 @@
     /* light green */
     --color-accent: #12cdea;
     /* sky blue */
-    --background-color: #100c2a;
+    --background-color: #000000;
     /* black */
     --font-color: #ffffff;
     /* white */
@@ -26,6 +26,17 @@ body {
     margin: 0;
     height: 100%;
     width: 100%;
-    background: var(--background-color, #100c2a);
+    background: var(--background-color, #000000);
     color: var(--font-color, #ffffff);
+}
+
+#div-menu {
+    /*adjust width to fit theme button */
+    width: 95vw;
+    height: 5vh;
+}
+
+#div-center {
+    width: 100vw;
+    height: 95vh;
 }
