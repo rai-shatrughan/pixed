@@ -1,4 +1,3 @@
-import "../style/header.css"
 import { Menus } from './Constants';
 
 export default function Header({ onClicked }) {

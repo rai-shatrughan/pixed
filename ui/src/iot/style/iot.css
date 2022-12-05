@@ -1,7 +1,7 @@
 .light {
-    --color-primary: #0060df;
+    --color-primary: #f4f8fa;
     /* light blue */
-    --color-accent: #fd6f53;
+    --color-accent: #797271;
     /* orange */
     --background-color: #ffffff;
     /* white */
@@ -10,11 +10,11 @@
 }
 
 .dark {
-    --color-primary: #7ec5a6;
+    --color-primary: #0a0a0a;
     /* light green */
-    --color-accent: #12cdea;
+    --color-accent: #eff4f5;
     /* sky blue */
-    --background-color: #000000;
+    --background-color: #100c2a;
     /* black */
     --font-color: #ffffff;
     /* white */
@@ -26,8 +26,38 @@ body {
     margin: 0;
     height: 100%;
     width: 100%;
-    background: var(--background-color, #000000);
+    background: var(--background-color, #100c2a);
     color: var(--font-color, #ffffff);
+}
+
+#login-form {
+    margin-top: 30vh;
+    margin-bottom: 10vh;
+    margin-left: 40vw;
+    width: 10vw;
+    height: 10vh;
+    position: absolute;
+}
+
+#login-legend {
+    color: var(--font-color, #ffffff);
+    background: var(--background-color, #100c2a);
+}
+
+.theme-button {
+    height: 1em;
+    width: 1em;
+    right: 10px;
+    top: 3px;
+    background-color: var(--background-color);
+    border: none;
+    cursor: pointer;
+    position: absolute;
+}
+
+.theme-icon {
+    height: inherit;
+    width: inherit;
 }
 
 #div-menu {
@@ -39,4 +69,26 @@ body {
 #div-center {
     width: 100vw;
     height: 95vh;
+}
+
+.pure-menu-item .pure-menu-link {
+    color: var(--font-color);
+    background: var(--background-color);
+}
+
+.pure-menu-item:hover .pure-menu-link:hover {
+    color: var(--background-color);
+    background: var(--font-color);
+}
+
+.pure-menu li a:hover,
+.pure-menu li a:focus {
+    background: none;
+    border: none;
+    color: #AECFE5;
+}
+
+input {
+    background: var(--color-primary);
+    color: var(--color-accent);
 }

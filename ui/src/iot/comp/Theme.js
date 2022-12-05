@@ -1,6 +1,5 @@
 import { React, useState } from "react";
 import { SunIcon, MoonIcon } from "@primer/octicons-react";
-import '../style/theme.css'
 
 export default function Theme() {
     const [theme, setTheme] = useState("dark");

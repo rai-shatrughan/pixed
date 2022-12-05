@@ -8,7 +8,7 @@ import Header from "./comp/Header"
 import { MenuMap } from "./comp/Constants"
 
 export default function Iot() {
-    const [loggedIn] = useState(true)
+    const [loggedIn] = useState(false)
     const [activeComp, setActiveComp] = useState("Home")
     const VisibleComponent = MenuMap[activeComp]
 
