@@ -20,4 +20,4 @@ cd api/am
 swagger generate server -f ../../yaml/assetmanagement-v3-18-3.yaml -A am -P models.Principal
 cd ../../
 go mod tidy
-go run api/am/cmd/am-server/main.go --host 0.0.0.0 --port 8002 --scheme http
+go run api/am/cmd/am-server/main.go --host 0.0.0.0 --port 8003 --scheme http

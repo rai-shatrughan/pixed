@@ -2394,17 +2394,47 @@ definitions:
     required:
       - typeId
       - parentId
-    allOf:
-      - $ref: '#/definitions/AssetUpdate'
-      - properties:
-          typeId:
-            $ref: '#/definitions/AssetTypeId'
-          parentId:
-            $ref: '#/definitions/uniqueId'
-          timezone:
-            $ref: '#/definitions/timezone'
-          twinType:
-            $ref: '#/definitions/twinType'
+    properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: '[^\/\\]*'
+          description: Name of the asset
+          example: Millenium Falcon
+        externalId:
+          type: string
+          description: The id given by the user
+          maxLength: 255
+          example: SN 123456-123-123456
+        description:
+          type: string
+          description: The description of the asset
+          maxLength: 255
+          pattern: '[^'']*'
+          example: The ship of Han Solo and Chewbacca
+        location:
+          $ref: '#/definitions/Location'
+        variables:
+          type: array
+          items:
+            $ref: '#/definitions/Variable'
+        aspects:
+          type: array
+          items:
+            $ref: '#/definitions/Aspect'
+        fileAssignments:
+          type: array
+          items:
+            $ref: '#/definitions/FileAssignment'
+        typeId:
+          $ref: '#/definitions/AssetTypeId'
+        parentId:
+          $ref: '#/definitions/uniqueId'
+        timezone:
+          $ref: '#/definitions/timezone'
+        twinType:
+          $ref: '#/definitions/twinType'
   twinType:
     type: string
     description: >-
@@ -2515,10 +2545,6 @@ definitions:
             example: 'DEPRECATED: use subTenant instead'
           assetId:
             $ref: '#/definitions/uniqueId'
-          fileAssignments:
-            type: array
-            items:
-              $ref: '#/definitions/FileAssignmentResource'
           locks:
             type: array
             items:
@@ -2526,12 +2552,6 @@ definitions:
           deleted:
             type: string
             format: date-time
-          twinType:
-            type: string
-            enum:
-              - performance
-              - simulation
-            default: performance
           sharing:
             $ref: '#/definitions/SharingResource'
           etag:
@@ -2867,6 +2887,8 @@ definitions:
       - name
       - dataType
     properties:
+      name:
+        type: string
       dataType:
         type: string
         enum:
