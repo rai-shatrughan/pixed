@@ -76,7 +76,7 @@ wrk:
 	cd gsvc; \
 	bash test/runGowrk.sh
 
-gsvc:
+gsvc-agm:
 	cd gsvc; \
 	cp -r pkg/conf ../docker/app; \
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../docker/app/bin/gsvc server/main.go

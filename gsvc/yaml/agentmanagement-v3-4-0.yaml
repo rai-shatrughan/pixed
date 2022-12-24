@@ -1,0 +1,1352 @@
+swagger: '2.0'
+info:
+  title: Agent Management API
+  description: >
+    API defining resources and operations for managing agents.
+  
+    
+    Generating a Boarding Configuration action is an asynchronous operation
+    therefore it may take a while. 
+    
+    In case Boarding Configuration is not generated, try to read the configuration again after a couple of seconds.
+  
+  version: '3.4.0'
+  x-visibility: external
+
+
+basePath: /api/agentmanagement/v3
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: Agent Operations
+  - name: Data Source Configuration Operations
+  - name: Boarding Operations
+  - name: Registration Operations
+  - name: Token Operations
+securityDefinitions:
+  agents:
+    type: oauth2
+    tokenUrl: 'http://authorization.connectivity.net/oauth/token'
+    flow: application
+    scopes:
+      agm.c: Permission to create an agent.
+      agm.r: Permission to read an agent.
+      agm.u: Permission to update agent.
+      agm.d: Permission to delete agent.
+  boarding:
+    type: oauth2
+    tokenUrl: 'http://authorization.connectivity.net/oauth/token'
+    flow: application
+    scopes:
+      obc.r: Permission read onboarding status.
+      obc.sec: Permission for offboarding and accessing onboarding material.
+
+  dataSources:
+    type: oauth2
+    tokenUrl: 'http://authorization.connectivity.net/oauth/token'
+    flow: application
+    scopes:
+      dsc.r: Permission to read data source configuration
+      dsc.u: Permission to update data source configuration
+
+paths:
+  /agents:
+    post:
+      tags:
+        - Agent Operations
+      summary: Create agent
+      description: |
+        Creates a new agent.
+      security:
+        - agents:
+            - agm.c
+      parameters:
+        - in: body
+          name: agent
+          description: Object describing new agent resource.
+          required: true
+          schema:
+            $ref: '#/definitions/CreateAgentRequest'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/Agent'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '409':
+          description: Resource is already available.
+          schema:
+            $ref: '#/definitions/Conflict'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+    get:
+      tags:
+        - Agent Operations
+      summary: Get agents
+      description: |
+        Gets the agents for the given filter.
+      security:
+        - agents:
+            - agm.r
+      parameters:
+        - name: filter
+          in: query
+          description: |
+              JSON based filter.
+              Filter json can contain following fields:
+              * securityProfile (Agents securityProfiles can be "RSA_3072", "SHARED_SECRET")
+              E.g.: {"securityProfile":"SHARED_SECRET"}
+              * id
+              E.g.: {"id":"3b27818ea09a46b48c7eb3fbd878349f"}
+              * name
+              E.g.: {"name":"Nanobox Agent"}
+          required: false
+          type: string
+        - name: size
+          in: query
+          description: The maximum number of elements in a page.
+          required: false
+          type: integer
+          default: 20
+          format: int32
+        - name: page
+          in: query
+          description: The (0-based) index of page.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: sort
+          in: query
+          description: |
+            The order of returned elements.
+            Multiple fields could be used separated by commas (e.g. ''field1,field2'').
+            Descending order could be requested by appending '',desc'' at the end of parameter.(e.g. ''field1,field2,desc'')'
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Array of agents
+          schema:
+            $ref: '#/definitions/PagedAgent'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+  /agents/{id}:
+    get:
+      tags:
+        - Agent Operations
+      summary: Get agent
+      description: |
+        Gets the agent for the given agent id.
+      security:
+        - agents:
+            - agm.r
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Agent'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+    put:
+      tags:
+        - Agent Operations
+      summary: Update agent
+      description: |
+        Updates the agent for the given agent id with given parameters.
+      security:
+        - agents:
+            - agm.u
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+        - in: body
+          name: agent
+          description: Agent update dto to update agent.
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateAgentRequest'
+        - in: header
+          name: If-Match
+          description: ETag number of resource.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Agent'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '409':
+          description: Resource is already available.
+          schema:
+            $ref: '#/definitions/Conflict'
+        '412':
+          description: Precondition Failed
+          schema:
+            $ref: '#/definitions/Preconditionfailed'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+    delete:
+      tags:
+        - Agent Operations
+      summary: Delete agent
+      description: |
+        Deletes the agent for the given agent id.
+      security:
+        - agents:
+            - agm.d
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+        - in: header
+          name: If-Match
+          description: ETag number of resource.
+          type: string
+          required: true
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '412':
+          description: Precondition Failed
+          schema:
+            $ref: '#/definitions/Preconditionfailed'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+  /agents/{id}/status:
+    get:
+      tags:
+        - Agent Operations
+      summary: Get online status
+      description: |
+        Gets online status.
+      security:
+        - agents:
+            - agm.r
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/OnlineStatus'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+
+  /agents/{id}/boarding/configuration:
+    get:
+      tags:
+        - Boarding Operations
+      summary: Get boarding configuration
+      description: |
+        Boarding configuration holds necessary information of the agent to onboard it.(ex; iat, clientCredentialProfile). Generating a Boarding Configuration action is an asynchronous operation therefore it may take a few seconds. In case Boarding Configuration is not generated, try to read the configuration again after a couple of seconds.
+      security:
+        - boarding:
+            - obc.sec
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Configuration'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+  /agents/{id}/boarding/offboard:
+    post:
+      tags:
+        - Boarding Operations
+      summary: Offboard agent
+      description: |
+        Offboards the agent.
+      security:
+        - boarding:
+            - obc.sec
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/OnboardingStatus'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '409':
+          description: Resource in conflicting state.
+          schema:
+            $ref: '#/definitions/Conflict'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+  /agents/{id}/boarding/status:
+    get:
+      tags:
+        - Boarding Operations
+      summary: Get boarding status
+      description: |
+        Gets boarding status.
+      security:
+        - boarding:
+            - obc.r
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/OnboardingStatus'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+
+  /agents/{id}/dataSourceConfiguration:
+    get:
+      tags:
+        - Data Source Configuration Operations
+      summary: Get Data Source Configuration
+      description: |
+        Data source configuration is needed for interpreting the data received from an agent. It is crucial for diot to interpret the data sent by an agent. The data source configuration contains data sources and data points. Data sources are logical groups of data points, e.g. a sensor or a machine. Fetches data source configuration object.
+      security:
+        - dataSources:
+            - dsc.r
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/DataSourceConfiguration'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+    put:
+      tags:
+        - Data Source Configuration Operations
+      summary: Update Data Source Configuration
+      description: |
+        Creates or updates data source configuration object.
+      security:
+        - dataSources:
+            - dsc.u
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the agent.
+          required: true
+          type: string
+        - in: body
+          name: configuration
+          description: Data source configuration object.
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateDataSourceConfigurationRequest'
+        - in: header
+          name: If-Match
+          description: ETag number of resource.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/DataSourceConfiguration'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Badrequest'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Forbidden'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Notfound'
+        '412':
+          description: Precondition Failed
+          schema:
+            $ref: '#/definitions/Preconditionfailed'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+
+  /register:
+    post:
+      tags:
+        - Registration Operations
+      summary: Register client.
+      description: |
+        Registers client based on given security profile.
+      parameters:
+        - name: Authorization
+          in: header
+          description: Initial Access Token value with Bearer authentication scheme.
+            e.g :Bearer eyJh...
+          required: true
+          type: string
+        - in: body
+          name: keys
+          description: The client's key in JWKS for security profile RSA.
+            If security profile is SHARED_SECRET the value is empty JSON.
+          required: true
+          schema:
+            $ref: '#/definitions/Keys'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/ClientIdentifier'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/BadrequestIAM'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/UnauthorizedIAM'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/TooManyRequests'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+  /register/{client_id}:
+    put:
+      tags:
+        - Registration Operations
+      summary: Update client information.
+      description: |
+        Updates clients information.
+      parameters:
+        - name: Authorization
+          in: header
+          description: Registration Access Token value with Bearer authentication scheme.
+            e.g :Bearer eyJh...
+          required: true
+          type: string
+        - name: client_id
+          in: path
+          description: Client identifier to update information.
+          required: true
+          type: string
+        - in: body
+          name: keys
+          description: The client's key in JWKS for security profile RSA.
+            If security profile is SHARED_SECRET there is only client_id in the JSON.
+          required: true
+          schema:
+            $ref: '#/definitions/RotationKeys'
+
+
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ClientIdentifier'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/BadrequestIAM'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/UnauthorizedIAM'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+          description: Other error with any status code and response body format.
+
+
+  /oauth/token:
+    post:
+      tags:
+        - Token Operations
+      summary: Grant an Access Token
+      description: |
+        Grants an Access Token.
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: grant_type
+          in: formData
+          description: The type of authentication being used to obtain the token, only  client_credentials is supported.
+          required: true
+          type: string
+        - name: client_assertion_type
+          in: formData
+          description: Defines the assertion type, only urn:ietf:params:oauth:client-assertion-type:jwt-bearer is supported.
+          required: true
+          type: string
+        - name: client_assertion
+          in: formData
+          description: | 
+            A jwt which is signed with client secret
+            
+            Signing keys (client secret) can vary depending on agent security profile:<br>
+                - __SHARED_SECRET__: Client secret is provided by '/register' | ‘/register/<client_id>’ endpoint
+                - __RSA_3072__: Private part of the client's RSA key which the public part was provided at '/register' | '/register/<client_id>’
+                - __CACertifiedX509__: Private counterpart of device certificate’s public key.
+
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/AccessToken'
+          headers:
+            Server-Time:
+              description: Server time represented as epoch(unix) time in seconds.
+              type: integer
+              format: int64
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/BadrequestIAM'
+          headers:
+            Server-Time:
+              description: Server time represented as epoch(unix) time in seconds.
+              type: integer
+              format: int64
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+           description: Other error with any status code and response body format.
+  /oauth/token_key:
+    get:
+      tags:
+        - Token Operations
+      summary: Returns the JWT signing key currently employed by Agent IAM
+      description: |
+        Provides current RSA public key of AgentIAM. AgentIAM uses corresponding RSA private key to sign access tokens, RATs and IATs.
+      parameters:
+        - name: If-None-Match
+          in: header
+          description: If-None-Match Parameter.
+          required: false
+          type: string
+      responses: 
+        '200': 
+          description: OK
+          schema: 
+            $ref: '#/definitions/TokenKey'
+        '304': 
+          description: Not Modified
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+           description: Other error with any status code and response body format.
+  /oauth/token_keys:
+    get:
+      tags:
+        - Token Operations
+      summary: Returns the JWT signing keys currently and previously employed by Agent IAM
+      description: |
+       Returns all valid JWT signing keys which can be used to verify JWTs (Bearer, RAT, IAT) issued by AgentIAM.
+       The first key corresponds to the currently employed one, all others have been used in the past.
+       The "kid" JWT claim allows to identify the signing key to be used.
+       This endpoint conforms with RFC 7517 and RFC 7518 and endpoints output can be parsed as stated in the above mentioned RFCs.
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/TokenKeys'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        'default':
+           description: Other error with any status code and response body format.
+
+definitions:
+  CreateAgentRequest:
+    type: object
+    required:
+          - name
+          - securityProfile
+          - entityId
+    properties:
+        name:
+          type: string
+          maxLength: 128
+          example: 'Nanobox Agent'
+          description: Name must be unique per tenant.
+        securityProfile:
+          type: string
+          enum:
+          - SHARED_SECRET
+          - RSA_3072
+        entityId:
+            type: string
+            description: Unique identifier of the entity
+            maxLength: 36
+            example: '3b27818ea09a46b48c7eb3fbd878349f'
+
+  Agent:
+    type: object
+    required:
+        - name
+        - securityProfile
+        - entityId
+    properties:
+        name:
+          type: string
+          maxLength: 128
+          example: 'Nanobox Agent'
+          description: Name must be unique per tenant.
+        securityProfile:
+          type: string
+          enum:
+          - SHARED_SECRET
+          - RSA_3072
+        id:
+          type: string
+          description: Unique identifier of the agent
+          maxLength: 36
+          example: '3b27818ea09a46b48c7eb3fbd878349f'
+        eTag:
+          type: string
+          example: '2'
+        entityId:
+          type: string
+          description: Unique identifier of the entity
+          maxLength: 36
+          example: '3b27818ea09a46b48c7eb3fbd878349f'
+  PagedAgent:
+    type: object
+    required:
+      - content
+      - totalPages
+      - totalElements
+      - last
+      - numberOfElements
+      - first
+      - sort
+      - size
+      - number
+    properties:
+      content:
+        type: array
+        items:
+          $ref: '#/definitions/Agent'
+      last:
+        description: Whether the current item is the last one.
+        type: boolean
+        example: true
+      totalPages:
+        description: The number of total pages.
+        type: integer
+        example: 1
+      totalElements:
+        description: The total amount of elements.
+        type: integer
+        example: 1
+      numberOfElements:
+        description: The number of elements currently on this page.
+        type: integer
+        example: 1
+      first:
+        description: Whether the current item is the first one.
+        type: boolean
+        example: true
+      sort:
+        description: The sorting parameters for the page.
+        type: array
+        items:
+          $ref: '#/definitions/Order'
+        example: null
+      size:
+        description: The size of the page.
+        type: integer
+        example: 20
+      number:
+        description: The number of the current item.
+        type: integer
+        example: 0
+
+  Order:
+    type: object
+    properties:
+      direction:
+        description: The order the property shall be sorted for.
+        type: string
+        enum:
+          - ASC
+          - DESC
+      property:
+        description: The property to order for.
+        type: string
+      ignoreCase:
+        description: Whether or not the sort will be case sensitive.
+        type: boolean
+      nullHandling:
+        type: string
+        enum:
+          - NATIVE
+          - NULLS_FIRST
+          - NULLS_LAST
+      descending:
+        description: Whether sorting for this property shall be descending.
+        type: boolean
+      ascending:
+        description: Whether sorting for this property shall be ascending.
+        type: boolean
+
+  UpdateAgentRequest:
+    type: object
+    required:
+      - name
+      - securityProfile
+    properties:
+      name:
+        type: string
+        maxLength: 128
+        example: 'Nanobox Agent'
+        description: Name must be unique per tenant.
+      securityProfile:
+        type: string
+        enum:
+          - SHARED_SECRET
+          - RSA_3072
+
+  OnlineStatus:
+    type: object
+    properties:
+      status:
+        type: string
+        enum:
+          - ONLINE
+          - OFFLINE
+      since:
+        type: string
+        format: date-time
+
+  UpdateDataSourceConfigurationRequest:
+    type: object
+    required:
+      - configurationId
+      - dataSources
+    properties:
+      configurationId:
+        type: string
+        maxLength: 36
+        description: Unique identifier of the datasource configuration.
+        example: "Configuration01"
+      dataSources:
+        type: array
+        items:
+          $ref: '#/definitions/DataSource'
+
+  DataSourceConfiguration:
+    type: object
+    required:
+      - configurationId
+      - dataSources
+    properties:
+      id:
+        type: string
+        maxLength: 36
+        example: "c3b7d31d-e966-46e6-9db1-d4b3e8c90d7b"
+      eTag:
+        type: string
+        example: '2'
+      configurationId:
+        type: string
+        maxLength: 36
+        description: Unique identifier of the datasource configuration.
+        example: "Configuration01"
+      dataSources:
+        type: array
+        items:
+          $ref: '#/definitions/DataSource'
+
+  DataSource:
+    type: object
+    required:
+      - name
+      - dataPoints
+    properties:
+      name:
+        type: string
+        maxLength: 64
+        example: "OPC-UA Server"
+      description:
+        type: string
+        maxLength: 256
+        example: "OPC-UA Server installed on site."
+      dataPoints:
+        type: array
+        items:
+          $ref: '#/definitions/DataPoint'
+      customData:
+        type: object
+        additionalProperties:
+          type: string
+          maxLength: 1024
+        description: A list of string tuples. Max 5 tuples allowed.
+        example: { "Host" : "192.168.0.111", "Port" : "8765" }
+
+  DataPoint:
+    type: object
+    required:
+      - id
+      - name
+      - type
+      - unit
+    properties:
+      id:
+        type: string
+        maxLength: 36
+        description: |
+          Identifier of this data point. This id needs to be unique per data source configuration. Agents expected to upload timeseries value with this id, enabling backend services to match data with this data point. 
+          This is NOT an auto generated field, enabling agents to specify it before uploading matching timeseries value.
+        example: DP001
+      name:
+        type: string
+        maxLength: 64
+        example: "Voltage"
+      description:
+        type: string
+        maxLength: 256
+        example: "Voltage value read."
+      type:
+        type: string
+        enum:
+          - INT
+          - LONG
+          - DOUBLE
+          - BOOLEAN
+          - STRING
+        example: DOUBLE
+      unit:
+        type: string
+        maxLength: 32
+        description: |
+          Unit of data point. Can be empty.
+        example: V
+      customData:
+        type: object
+        additionalProperties:
+          type: string
+          maxLength: 1024
+        description: A list of string tuples. Max 5 tuples allowed.
+        example: { "Nominal" : "~220 Volts" }
+
+  Configuration:
+    type: object
+    properties:
+      content:
+        $ref: '#/definitions/OnboardingConfigurationContent'
+      expiration:
+        type: string
+        format: date-time
+
+  OnboardingConfigurationContent:
+    type: object
+    properties:
+      baseUrl:
+        type: string
+        example: 'https://southgate.eu-central.diot.io'
+      iat:
+        type: string
+        example: 'eyJh...'
+      clientCredentialProfile:
+        type: array
+        items:
+          type: string
+          example: "SHARED_SECRET"
+      clientId:
+        type: string
+        example: '5fa51b64-dce2-11e7-9296-cec278b6b50a'
+        maxLength: 36
+      tenant:
+        type: string
+        example: 'testtenant'
+        maxLength: 36
+
+  OnboardingStatus:
+    type: object
+    properties:
+      status:
+        type: string
+        enum:
+          - NOT_ONBOARDED
+          - ONBOARDING
+          - ONBOARDED
+
+  Keys:
+    type: object
+    properties:
+      jwks:
+        $ref: '#/definitions/Jwks'
+
+  RotationKeys:
+    type: object
+    properties:
+      client_id:
+        type: string
+      jwks:
+        $ref: '#/definitions/Jwks'
+
+  Jwks:
+    type: object
+    properties:
+      keys:
+        type: array
+        items:
+          $ref: '#/definitions/Key'
+
+  Key:
+    type: object
+    required: [e, n, kty, kid]
+    properties:
+      e:
+        type: string
+      n:
+        type: string
+      kty:
+        type: string
+        example: 'RSA'
+      kid:
+        type: string
+
+  ClientIdentifier:
+    type: object
+    required: [client_id, registration_client_uri, registration_access_token]
+    properties:
+      client_id:
+        $ref: '#/definitions/ClientId'
+      client_secret:
+        type: string
+        description: Server generated client secret. Required if security profile is SHARED_SECRET.
+      client_secret_expires_at:
+        type: integer
+        format: int64
+        description: Epoch time in seconds which client secret expires at.
+        example: 1511020133
+      grant_types:
+        type: array
+        items:
+          type: string
+          enum:
+            - SHARED_SECRET
+            - RSA_3072
+      registration_access_token:
+        type: string
+        description: The access token to be used at the client configuration endpoint to perform subsequent operations upon the client registration.
+        example: 'eyJh...'
+      registration_client_uri:
+        type: string
+        description: The fully qualified URL of the client configuration endpoint for this client.
+        format: uri
+        example: 'https://southgate.eu-central.diot.io/api/agentmanagement/v3/register/0b2d1cde-cc76-11e7-abc4-cec278b6b50a'
+      token_endpoint_auth_method:
+        type: string
+        description: The client authentication method.
+        enum:
+          - client_secret_jwt
+          - private_key_jwt
+
+  ClientId:
+    type: string
+    description: Client identifier, equals value of 'sub' claim in IAT.
+    maxLength: 36
+    example: '0b2d1cde-cc76-11e7-abc4-cec278b6b50a'
+
+  Jti:
+    type: string
+    description: Unique identifier of the token.
+    maxLength: 36
+    example: '3fcf2a5e-cc76-11e7-abc4-cec278b6b50a'
+
+  AccessToken:
+    type: object
+    properties:
+      access_token:
+        type: string
+        description: The access token to be used in calls to diot with Bearer authentication scheme.
+        example: 'eyJh...'
+      token_type:
+        type: string
+        description: The type of the access token issued.
+        example: 'bearer'
+      expires_in:
+        type: integer
+        description: Number of seconds before this token expires from the time of issuance.
+        format: int64
+        example: 43199
+      jti:
+        $ref: '#/definitions/Jti'
+      scope:
+        description: Agent permissions list.
+        type: array
+        items:
+          type: string
+          example: 'devicescope'
+
+  TokenKey:
+    type: object
+    required: [e, n, kty, kid]
+    properties:
+      alg:
+        type: string
+      use:
+        type: string
+      value:
+        type: string
+      e:
+        type: string
+      n:
+        type: string
+      kty:
+        type: string
+        example: 'RSA'
+      kid:
+        type: string
+  TokenKeys:
+    type: object
+    properties:
+          keys:
+            type: array
+            items:
+             $ref: '#/definitions/TokenKey'
+
+  Unauthorized:
+    type: object
+    properties:
+      id:
+        type: string        
+      message:
+        type: string
+        example: 'Not authorized to access this resource.'
+
+  Forbidden:
+    type: object
+    properties:
+      id:
+        type: string        
+      message:
+        type: string
+        example: 'Insufficient authorization for this resource.'
+
+  Badrequest:
+    type: object
+    properties:
+      id:
+        type: string        
+      message:
+        type: string
+        example: 'The request is not valid.'
+
+  Notfound:
+    type: object
+    properties:
+      id:
+        type: string        
+      message:
+        type: string
+        example: 'Resource not found.'
+
+  Conflict:
+    type: object
+    description: Operation on resource is not allowed due to a conflicting state.
+    properties:
+      id:
+        type: string        
+      message:
+        type: string
+        example: 'Resource is already available.'
+
+  Preconditionfailed:
+    type: object
+    properties:
+      id:
+        type: string        
+      message:
+        type: string
+        example: 'Resource not found with given the condition.'
+
+  Error:
+    type: object
+    properties:
+      id:
+        type: string
+      message:
+        type: string
+
+  BadrequestIAM:
+    type: object
+    properties:
+      id:
+        type: string
+      error:
+        type: string
+        example: 'invalid_authorization_header'
+      error_description:
+        type: string
+        description: An error message with Correlation-ID value.
+        example: '[feae1a0b-48fb-4af5-bc0d-7c96d8058e37] Header is missing.'
+
+  UnauthorizedIAM:
+    type: object
+    properties:
+      id:
+        type: string
+      error:
+        type: string
+        example: 'token_validation_failed'
+      error_description:
+        type: string
+        description: An error message with Correlation-ID value.
+        example: '[d6270fa4-f8f2-46d7-8370-1fbcacb37c52] Token validation failed.'
+        
+  TooManyRequests:
+    type: object
+    properties:
+      id:
+        type: string
+      error:
+        type: string
+        example: 'too_many_requests'
+      error_description:
+        type: string
+        description: An error message with Correlation-ID value.
+        example: '[d6270fa4-f8f2-46d7-8370-1fbcacb37c52] There is already an ongoing registration process for the agent.'
