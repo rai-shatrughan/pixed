@@ -157,13 +157,16 @@ services:
     container_name: gsvc
     image: gsvc:v1
     restart: always
-    entrypoint: ["/usr/bin/gsvc"]
+    entrypoint: ["/usr/bin/gsvc", "--host", "0.0.0.0", "--scheme", "http"]
     environment:
       - KAFKA_BROKERS=${KAFKA_IP}:9092
       - SERVICE_NAME=gsvc
       - JAEGER_IP=${JAEGER_AGENT_IP}
     expose:
       - 8000
+      - 8001
+      - 8002
+      - 8003
     volumes:
       - /data/asset:/data/asset
     networks:
