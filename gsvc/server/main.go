@@ -10,6 +10,7 @@ import (
 
 	agmapi "gsvc/api/agm/restapi"
 	agmop "gsvc/api/agm/restapi/operations"
+	"gsvc/pkg/gateway"
 
 	amapi "gsvc/api/am/restapi"
 	amop "gsvc/api/am/restapi/operations"
@@ -22,6 +23,7 @@ var wg sync.WaitGroup
 
 func main() {
 	wg.Add(1)
+	go gateway.Start(8000)
 	go agm(8001)
 	go ts(8002)
 	go am(8003)
