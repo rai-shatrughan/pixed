@@ -15,6 +15,7 @@ func init() {
 	pMap["127.0.0.1:8001"] = "/api/agentmanagement/v3/"
 	pMap["127.0.0.1:8002"] = "/api/iottimeseries/v3/"
 	pMap["127.0.0.1:8003"] = "/api/assetmanagement/v3/"
+	pMap["127.0.0.1:8004"] = "/api/mindconnect/v3/"
 }
 
 // NewProxy takes target host and creates a reverse proxy
